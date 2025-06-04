@@ -1,3 +1,3 @@
 function runTest() {
-    console.log('asa')
+    console.log('asa nu');
 }
