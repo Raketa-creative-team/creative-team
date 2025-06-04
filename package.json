@@ -1,0 +1,11 @@
+{
+  "name": "creative-team",
+  "version": "1.0.0",
+  "description": "Creative team code base",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "author": "",
+  "license": "ISC"
+}
