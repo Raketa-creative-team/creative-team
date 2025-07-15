@@ -1,3 +1,5 @@
+// https://studio-ui.teads.tv/studio/6753877077236308/editor/code/js
+
 const sliderConfig = {
 	sliderType: 'onSwipe', // onScroll, onSwipe
 	slideTo: 'left', // use left, right, top, bottom. top and bottom do not work with onSwipe type;
@@ -34,7 +36,6 @@ function initSlider(config) {
 	const {
 		sliderType,
 		slideTo,
-		container,
 		frontElement,
 		backgroundElement,
 		onScroll,
@@ -49,7 +50,7 @@ function initSlider(config) {
 	}
 
 	if (sliderType === "onScroll") {
-		onSwipe.dragElement.hide();
+		onSwipe.dragElement && onSwipe.dragElement.hide();
 	}
 
 	applyRecursiveStyle({frontElement, style: getStyle(slideTo)})
@@ -218,7 +219,7 @@ function autoReveal(config) {
 	dragElement.htmlElement.addEventListener('animationend', async () => {
 		Object.assign(dragElement.htmlElement.style, { transition: `left ${autoReveal.transition}ms linear` });
 
-		await sleep(autoReveal.transition);
+		await sleep(autoReveal.after);
 		Object.assign(dragElement.htmlElement.style, { left: `${left}px` });
 	})
 
