@@ -32,6 +32,8 @@ sliderConfig.container.onshowAnimationEnd.addObserver(function () {
 	sliderConfig.container.onshowAnimationEnd.removeObserver(arguments.callee);
 });
 
+const playerStatus = getPlayerStatus();
+
 function initSlider(config) {
 	const {
 		sliderType,
@@ -56,7 +58,7 @@ function initSlider(config) {
 
 	applyRecursiveStyle({frontElement, style: getStyle(slideTo)})
 
-	const getPercent = getSliderType(sliderType);
+	const getPercent = getCallbackByType(sliderType);
 	const percentParams = getPercentParams({ sliderType, onScroll, onSwipe, slideTo });
 
 	const slider = new Slider({
@@ -65,6 +67,7 @@ function initSlider(config) {
 		backgroundElement,
 		slideTo,
 		container,
+		getPlayerStatus: playerStatus,
 	});
 
 	frontElement.htmlElement.style.opacity = 0.9999; //render issue fix
@@ -75,7 +78,7 @@ function initSlider(config) {
 }
 
 function Slider(config) {
-	let {getPercent, frontElement, backgroundElement, slideTo, container} = config;
+	let {getPercent, frontElement, backgroundElement, slideTo, container, getPlayerStatus} = config;
 
 	let lastPercent = undefined;
 
@@ -121,6 +124,8 @@ function Slider(config) {
 	}
 
 	this.toggleVideo = (percent) => {
+		const playerStatus = getPlayerStatus();
+		console.log(playerStatus)
 		const isPreviewOn = !!container.htmlElement.querySelector('.togglePreview');
 
 		if (isPreviewOn) return;
@@ -153,7 +158,20 @@ function Slider(config) {
 	frontElement.htmlElement.style.overflow = 'hidden';
 }
 
-function getSliderType(sliderType) {
+function getPlayerStatus() {
+	let status = 'suspended';
+
+	adController.onsuspend.addObserver(() => status = 'suspended');
+	adController.onstart.addObserver(() => status = 'playing');	
+	adController.onresume.addObserver(() => status = 'playing');
+	adController.onplay.addObserver(() => status = 'playing');	
+
+	return () => status;
+}
+
+this.getTeadsPlayerStatus = getPlayerStatus;
+
+function getCallbackByType(sliderType) {
 	const types = new Map([
 		['onSwipe', getMousePercent],
 		['onScroll', getPlayerBounds]
