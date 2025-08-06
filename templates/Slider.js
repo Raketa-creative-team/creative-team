@@ -40,6 +40,7 @@ function initSlider(config) {
 		backgroundElement,
 		onScroll,
 		onSwipe,
+		container
 	} = config;
 
 	if (hasWrongConfiguration(sliderType, slideTo)) return displayMessage();
@@ -62,7 +63,8 @@ function initSlider(config) {
 		getPercent: getPercent(...percentParams),
 		frontElement,
 		backgroundElement,
-		slideTo
+		slideTo,
+		container,
 	});
 
 	frontElement.htmlElement.style.opacity = 0.9999; //render issue fix
@@ -73,7 +75,7 @@ function initSlider(config) {
 }
 
 function Slider(config) {
-	let {getPercent, frontElement, backgroundElement, slideTo} = config;
+	let {getPercent, frontElement, backgroundElement, slideTo, container} = config;
 
 	let lastPercent = undefined;
 
@@ -119,11 +121,14 @@ function Slider(config) {
 	}
 
 	this.toggleVideo = (percent) => {
+		const isPreviewOn = !!container.htmlElement.querySelector('.togglePreview');
+
+		if (isPreviewOn) return;
+		
 		if (frontVideo) {
 			const shouldPlayVideo = percent >= playVideoAt;
 			shouldPlayVideo ? frontVideo.element.play() : frontVideo.element.pause();
 		}
-
 		if (backVideo) {
 			const shouldPlayVideo = percent < playVideoAt;
 			shouldPlayVideo ? backVideo.element.play() : backVideo.element.pause();
@@ -280,6 +285,10 @@ function togglePreviewAnimation(config) {
 	dragElement.htmlElement.addEventListener(events.pointerDown, () => {
 		dragElement.htmlElement.classList.remove('togglePreview');
 	}, false)
+
+	dragElement.htmlElement.addEventListener('animationend', () => {
+		dragElement.htmlElement.classList.remove('togglePreview');		
+	})
 }
 
 function addDrag(element, snap) {
