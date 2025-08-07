@@ -24,15 +24,14 @@ const sliderConfig = {
 			duration: 2000,              // Travel distance duration. Change here is you need a different duration.
 			travelDistance: -180,       // Travel distance of the slider animation, in px. Change here if you need a different distance. Can use negative values
 		}
-	}
+	},
+	getPlayerStatus: getPlayerStatus(),
 }
 
 sliderConfig.container.onshowAnimationEnd.addObserver(function () {
 	initSlider(sliderConfig);
 	sliderConfig.container.onshowAnimationEnd.removeObserver(arguments.callee);
 });
-
-const playerStatus = getPlayerStatus();
 
 function initSlider(config) {
 	const {
@@ -42,7 +41,8 @@ function initSlider(config) {
 		backgroundElement,
 		onScroll,
 		onSwipe,
-		container
+		container,
+		getPlayerStatus,
 	} = config;
 
 	if (hasWrongConfiguration(sliderType, slideTo)) return displayMessage();
@@ -67,7 +67,7 @@ function initSlider(config) {
 		backgroundElement,
 		slideTo,
 		container,
-		getPlayerStatus: playerStatus,
+		getPlayerStatus
 	});
 
 	frontElement.htmlElement.style.opacity = 0.9999; //render issue fix
@@ -125,7 +125,7 @@ function Slider(config) {
 
 	this.toggleVideo = (percent) => {
 		const playerStatus = getPlayerStatus();
-		console.log(playerStatus)
+		
 		const isPreviewOn = !!container.htmlElement.querySelector('.togglePreview');
 
 		if (isPreviewOn) return;
