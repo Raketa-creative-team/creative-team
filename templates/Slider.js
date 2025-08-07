@@ -125,13 +125,15 @@ function Slider(config) {
 
 	this.toggleVideo = (percent) => {
 		const playerStatus = getPlayerStatus();
+
+		if (playerStatus === 'suspended') return;
 		
 		const isPreviewOn = !!container.htmlElement.querySelector('.togglePreview');
 
 		if (isPreviewOn) return;
 		
 		if (frontVideo) {
-			const shouldPlayVideo = percent >= playVideoAt;
+			const shouldPlayVideo = percent > playVideoAt;
 			shouldPlayVideo ? frontVideo.element.play() : frontVideo.element.pause();
 		}
 		if (backVideo) {
@@ -144,12 +146,13 @@ function Slider(config) {
 		bnt.requestAnimFrame(this.animate);
 		const percent = getPercent();
 
+		this.toggleVideo(percent);
+
 		if (percent === lastPercent) return;
 
 		lastPercent = percent;
-
+	
 		this.updateFrontCover(percent);
-		this.toggleVideo(percent);
 		shouldTrack && this.track(percent);
 
 		this.onUpdate(percent);
@@ -313,10 +316,10 @@ function addDrag(element, snap) {
 	const events = getEventsType();
 	const getCoords = getEventCoords();
 
-
 	let pointerDown = false;
 
 	function onEnd() {
+		if (!pointerDown) return;
 		pointerDown = false;
 
 		if (!snap) return;
