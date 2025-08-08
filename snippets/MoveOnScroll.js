@@ -29,7 +29,7 @@ const mos = new MoveOnScroll(moveConfig);
 function MoveOnScroll(elements) {
 
     let raf, lastPercent;
-    const getScrollPercent = getPlayerPos();
+    const getScrollPercent = getPlayerBounds(0, 1)
 
     const init = () => {
         this.loop();
@@ -67,7 +67,7 @@ function MoveOnScroll(elements) {
 
         if (transformCSS !== "")
             applyStyle(el, "transform", transformCSS);
-        
+
         const opacity = getOpacityValue(el, percent);
 
         applyStyle(el, 'opacity', opacity);
@@ -152,60 +152,51 @@ function MoveOnScroll(elements) {
     //At screen change, reset elements positions
     function resetElementsPositions() {
         const percent = getScrollPercent();
-        
+
         toggleElementTransitions(false);
-        arrangeElements(percent); 
+        arrangeElements(percent);
         toggleElementTransitions(true);
     }
 
-    function toggleElementTransitions(shouldEnable){
+    function toggleElementTransitions(shouldEnable) {
         elements.forEach(function (el, idx) {
             //Skip element if HTML element not yet loaded, or if progressive (transition not needed) 
             // if (!el.element.htmlElement || el.progressive)
-                // return;
+            // return;
 
-            if(shouldEnable)
+            if (shouldEnable)
                 bnt.requestAnimFrame(function () { addElementTransition(el); });
             else
                 removeElementTransition(el);
         });
     }
 
-    function getPlayerPos() {
+    function getPlayerBounds(start, end) {
         let percent = 0;
-
-        function updateScrollPercent(api) {
+        const getTeadsApi = () => {
+            let teadsApi;
+            bnt.TeadsPlayerAddons.apiProxy.addObserver(api => teadsApi = api);
+            return teadsApi;
+        }
+        let teadsApi = getTeadsApi()
+        return function () {
+            const api = teadsApi || getTeadsApi();
             if (!api) return percent;
-
             api.getSlotBounds().map(function (slotBounds) {
                 const topWindowHeight = slotBounds.viewportHeight;
                 const playerTop = slotBounds.top;
-                percent = 1 - playerTop / (topWindowHeight - window.innerHeight);
-                percent = Math.max(0, Math.min(1, percent));
+                const playerHeight = slotBounds.height;
+                const playerSizeInPerc = playerHeight / topWindowHeight;
+                const minEdge = -playerSizeInPerc;
+                const maxEdge = 1 + playerSizeInPerc;
+                const minPerc = Math.max(minEdge, start + playerSizeInPerc);
+                const maxPerc = Math.min(maxEdge, end);
+                percent = 1 - playerTop / topWindowHeight;
+                percent = remapRange(percent, [minPerc, maxPerc], [0, 1])
             });
-
             return percent;
-        }
-
-        function getTeadsApi() {
-            let teadsApi;
-
-            const setTeadsApi = api => teadsApi = api;
-            bnt.TeadsPlayerAddons.apiProxy.addObserver(setTeadsApi);
-
-            if (teadsApi) return teadsApi;
-
-            bnt.TeadsPlayerAddons.apiProxy.removeObserver(setTeadsApi);
-
-            bnt.requestAnimFrame(getTeadsApi)
-        }
-
-        const teadsApi = getTeadsApi();
-
-        return function () {
-            return updateScrollPercent(teadsApi);
         };
-    };
+    }
 
     function addElementTransition(el) {
         const transitionPropertiesList = [];
