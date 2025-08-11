@@ -1,0 +1,1 @@
+console.log('test b2 orice o fi ala');
