@@ -74,7 +74,7 @@ function MoveOnScroll(elements) {
     }
 
     function getTranslateX(el, percent) {
-        if (!el.horizontal)
+        if (!el.horizontal) return
             return "";
 
         const translateX = el.horizontal * percent;
