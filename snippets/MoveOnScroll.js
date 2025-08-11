@@ -47,7 +47,7 @@ function MoveOnScroll(elements) {
         raf = bnt.requestAnimFrame(this.loop);
 
         const percent = getScrollPercent();
-        if (percent === lastPercent)
+        if (percent === lastPercent) return;
             return;
 
         arrangeElements(percent);
