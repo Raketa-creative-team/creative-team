@@ -48,7 +48,6 @@ function MoveOnScroll(elements) {
 
         const percent = getScrollPercent();
         if (percent === lastPercent) return;
-            return;
 
         arrangeElements(percent);
 
@@ -74,16 +73,14 @@ function MoveOnScroll(elements) {
     }
 
     function getTranslateX(el, percent) {
-        if (!el.horizontal) return
-            return "";
+        if (!el.horizontal) return "";
 
         const translateX = el.horizontal * percent;
         return percent ? "translateX(" + translateX + "px) " : "translateX(0px)";
     }
 
     function getTranslateY(el, percent) {
-        if (!el.vertical) return;
-            return "";
+        if (!el.vertical) return "";
 
         const translateY = el.vertical * percent;
         return percent ? "translateY(" + translateY + "px) " : "translateY(0px)";
@@ -91,7 +88,6 @@ function MoveOnScroll(elements) {
 
     function getScale(el, percent) {
         if (el.scale === false || el.scale === null) return "";
-            return "";
 
         const [startScale, endScale] = el.scale;
         let currentScale;
@@ -124,8 +120,7 @@ function MoveOnScroll(elements) {
 
     function arrangeElements(percent) {
         elements.forEach(function (el, idx) {
-            if (!el.element.htmlElement)
-                return;
+            if (!el.element.htmlElement) return;
 
             //percent calculated relative to element scroll interval. 
             //In case of progressive: false, it return 1 (inside triggerScrollInterval) or 0 (outside)
@@ -144,7 +139,6 @@ function MoveOnScroll(elements) {
 
         const isInRange = percent >= minTrigger && percent <= maxTrigger;
         if (isInRange) return 1;
-            return 1;
 
         return 0;
     }
@@ -161,8 +155,6 @@ function MoveOnScroll(elements) {
     function toggleElementTransitions(shouldEnable) {
         elements.forEach(function (el, idx) {
             //Skip element if HTML element not yet loaded, or if progressive (transition not needed) 
-            // if (!el.element.htmlElement || el.progressive)
-            // return;
 
             if (shouldEnable)
                 bnt.requestAnimFrame(function () { addElementTransition(el); });
@@ -174,13 +166,13 @@ function MoveOnScroll(elements) {
     function getPlayerBounds(start, end) {
         let percent = 0;
 
-const getTeadsApi = () => {
+        const getTeadsApi = () => {
             let teadsApi;
             bnt.TeadsPlayerAddons.apiProxy.addObserver(api => teadsApi = api);
             return teadsApi;
         }
 
-let teadsApi = getTeadsApi()
+        let teadsApi = getTeadsApi()
 
         return function () {
             const api = teadsApi || getTeadsApi();
@@ -201,7 +193,6 @@ let teadsApi = getTeadsApi()
         };
     }
 
-    
     function addElementTransition(el) {
         const transitionPropertiesList = [];
 
