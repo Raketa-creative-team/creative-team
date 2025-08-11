@@ -90,7 +90,7 @@ function MoveOnScroll(elements) {
     }
 
     function getScale(el, percent) {
-        if (el.scale === false || el.scale === null)
+        if (el.scale === false || el.scale === null) return "";
             return "";
 
         const [startScale, endScale] = el.scale;
