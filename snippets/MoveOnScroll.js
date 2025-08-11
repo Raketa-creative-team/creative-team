@@ -198,6 +198,7 @@ function MoveOnScroll(elements) {
         };
     }
 
+    
     function addElementTransition(el) {
         const transitionPropertiesList = [];
 
