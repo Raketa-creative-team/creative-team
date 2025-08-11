@@ -82,7 +82,7 @@ function MoveOnScroll(elements) {
     }
 
     function getTranslateY(el, percent) {
-        if (!el.vertical)
+        if (!el.vertical) return;
             return "";
 
         const translateY = el.vertical * percent;
@@ -143,7 +143,7 @@ function MoveOnScroll(elements) {
             return remapRange(percent, [minTrigger, maxTrigger], [0, 1]);
 
         const isInRange = percent >= minTrigger && percent <= maxTrigger;
-        if (isInRange)
+        if (isInRange) return 1;
             return 1;
 
         return 0;
@@ -173,12 +173,15 @@ function MoveOnScroll(elements) {
 
     function getPlayerBounds(start, end) {
         let percent = 0;
-        const getTeadsApi = () => {
+
+const getTeadsApi = () => {
             let teadsApi;
             bnt.TeadsPlayerAddons.apiProxy.addObserver(api => teadsApi = api);
             return teadsApi;
         }
-        let teadsApi = getTeadsApi()
+
+let teadsApi = getTeadsApi()
+
         return function () {
             const api = teadsApi || getTeadsApi();
             if (!api) return percent;
