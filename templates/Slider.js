@@ -286,7 +286,7 @@ function getStyle(slideTo) {
 function applyRecursiveStyle(config) {
 	const {frontElement, style} = config;
 
-	const divs = [frontElement.htmlElement, frontElement.htmlElement.querySelector('div')];
+	const divs = [frontElement.htmlElement, ...frontElement.htmlElement.querySelectorAll('div')];
 
 	divs.forEach(div => Object.assign(div.style, style))
 }
