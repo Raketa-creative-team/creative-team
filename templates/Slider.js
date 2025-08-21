@@ -92,6 +92,7 @@ function Slider(config) {
 	const isVertical = slideTo === 'top' || slideTo === 'bottom';
 	const dimension = isVertical ? 'height' : 'width';
 
+	let videoEnded = false;
 	//Added this in case you want to simulate a reveal animation and do not wanna track that
 	let shouldTrack = true;
 
@@ -123,10 +124,18 @@ function Slider(config) {
 		frontElement.htmlElement.style[dimension] = percent * creative.canvases[0].config[dimension] + 'px';
 	}
 
+	this.monitorVideoEnd = () => {
+		const video = frontVideo || backVideo;
+		
+		if (!video) return;
+		
+		video.element.onend.addObserver(() => {videoEnded = true})
+	}
+
 	this.toggleVideo = (percent) => {
 		const playerStatus = getPlayerStatus();
 
-		if (playerStatus === 'suspended') return;
+		if (playerStatus === 'suspended' || videoEnded) return;
 		
 		const isPreviewOn = !!container.htmlElement.querySelector('.togglePreview');
 
@@ -151,6 +160,7 @@ function Slider(config) {
 		if (percent === lastPercent) return;
 
 		lastPercent = percent;
+		videoEnded = false;
 	
 		this.updateFrontCover(percent);
 		shouldTrack && this.track(percent);
@@ -159,6 +169,8 @@ function Slider(config) {
 	}
 
 	frontElement.htmlElement.style.overflow = 'hidden';
+
+	this.monitorVideoEnd();
 }
 
 function getPlayerStatus() {
