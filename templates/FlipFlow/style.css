@@ -1,0 +1,207 @@
+/**************************************************
+    => Mixins
+**************************************************/
+/**************************************************
+    => General Rules
+**************************************************/
+body {
+  background-color: white;
+}
+
+.ss {
+  perspective: 1000px;
+}
+.ss * {
+  transform-style: preserve-3d;
+}
+.ss .flipToLeft,
+.ss .flipToRight,
+.ss .flipFromLeft,
+.ss .flipFromRight {
+  backface-visibility: hidden;
+  transform-origin: center;
+}
+.ss .flipToLeft {
+  animation-name: flipToLeft;
+}
+@keyframes flipToLeft {
+  0% {
+    transform: rotateY(0deg) translateZ(1px);
+    visibility: visible;
+  }
+  50% {
+    transform: rotateY(-90deg) translateZ(0);
+    visibility: hidden;
+  }
+  100% {
+    transform: rotateY(-180deg) translateZ(-1px);
+    visibility: hidden;
+  }
+}
+.ss .flipFromLeft {
+  animation-name: flipFromLeft;
+}
+@keyframes flipFromLeft {
+  0% {
+    transform: rotateY(-180deg) translateZ(1px);
+    visibility: hidden;
+  }
+  50% {
+    transform: rotateY(-90deg) translateZ(0);
+    visibility: visible;
+  }
+  100% {
+    transform: rotateY(0deg) translateZ(-1px);
+    visibility: visible;
+  }
+}
+.ss .flipToRight {
+  animation-name: flipToRight;
+}
+@keyframes flipToRight {
+  0% {
+    transform: rotateY(0deg) translateZ(1px);
+    visibility: visible;
+  }
+  50% {
+    transform: rotateY(90deg) translateZ(0);
+    visibility: hidden;
+  }
+  100% {
+    transform: rotateY(180deg) translateZ(1px);
+    visibility: hidden;
+  }
+}
+.ss .flipFromRight {
+  animation-name: flipFromRight;
+}
+@keyframes flipFromRight {
+  0% {
+    transform: rotateY(180deg) translateZ(1px);
+    visibility: hidden;
+  }
+  50% {
+    transform: rotateY(90deg) translateZ(0);
+    visibility: visible;
+  }
+  100% {
+    transform: rotateY(0deg) translateZ(-1px);
+    visibility: visible;
+  }
+}
+.ss .slideToLeft,
+.ss .slideFromLeft,
+.ss .slideToRight,
+.ss .slideFromRight,
+.ss .slideToTop,
+.ss .slideFromTop,
+.ss .slideToBottom,
+.ss .slideFromBottom {
+  transform-origin: center;
+}
+.ss .slideToLeft {
+  animation-name: slideToLeft;
+}
+@keyframes slideToLeft {
+  from {
+    transform: translateX(0);
+    visibility: visible;
+  }
+  to {
+    transform: translateX(-100%);
+    visibility: hidden;
+  }
+}
+.ss .slideFromLeft {
+  animation-name: slideFromLeft;
+}
+@keyframes slideFromLeft {
+  from {
+    transform: translateX(-100%);
+    visibility: visible;
+  }
+  to {
+    transform: translateX(0);
+    visibility: visible;
+  }
+}
+.ss .slideToRight {
+  animation-name: slideToRight;
+}
+@keyframes slideToRight {
+  from {
+    transform: translateX(0);
+    visibility: visible;
+  }
+  to {
+    transform: translateX(100%);
+    visibility: hidden;
+  }
+}
+.ss .slideFromRight {
+  animation-name: slideFromRight;
+}
+@keyframes slideFromRight {
+  from {
+    transform: translateX(100%);
+    visibility: visible;
+  }
+  to {
+    transform: translateX(0);
+    visibility: visible;
+  }
+}
+.ss .slideToTop {
+  animation-name: slideToTop;
+}
+@keyframes slideToTop {
+  from {
+    transform: translateY(0);
+    visibility: visible;
+  }
+  to {
+    transform: translateY(-100%);
+    visibility: hidden;
+  }
+}
+.ss .slideFromTop {
+  animation-name: slideFromTop;
+}
+@keyframes slideFromTop {
+  from {
+    transform: translateY(-100%);
+    visibility: visible;
+  }
+  to {
+    transform: translateY(0);
+    visibility: visible;
+  }
+}
+.ss .slideToBottom {
+  animation-name: slideToBottom;
+}
+@keyframes slideToBottom {
+  from {
+    transform: translateY(0);
+    visibility: visible;
+  }
+  to {
+    transform: translateY(100%);
+    visibility: hidden;
+  }
+}
+.ss .slideFromBottom {
+  animation-name: slideFromBottom;
+}
+@keyframes slideFromBottom {
+  from {
+    transform: translateY(100%);
+    visibility: visible;
+  }
+  to {
+    transform: translateY(0);
+    visibility: visible;
+  }
+}
+
+/*# sourceMappingURL=style.css.map */
