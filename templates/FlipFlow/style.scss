@@ -2,44 +2,45 @@
     => Mixins
 **************************************************/
 @mixin animation($name) {
-    animation-name: $name;
+  animation-name: $name;
 }
 
-@mixin flip-animation($name, $axis, $from-rot, $mid-rot, $to-rot, $from-z, $mid-z, $to-z, $from-vis, $mid-vis, $to-vis) {
-    $rotate: if($axis =='X', rotateX, rotateY);
+@mixin flip-animation($name, $axis, $from, $mid, $to) {
+  $rotate: if($axis =='X', rotateX, rotateY);
 
-    @keyframes #{$name} {
-        0% {
-            transform: #{$rotate}($from-rot) translateZ($from-z);
-            visibility: $from-vis;
-        }
-
-        50% {
-            transform: #{$rotate}($mid-rot) translateZ($mid-z);
-            visibility: $mid-vis;
-        }
-
-        100% {
-            transform: #{$rotate}($to-rot) translateZ($to-z);
-            visibility: $to-vis;
-        }
+  @keyframes #{$name} {
+    0% {
+      transform: #{$rotate}(nth($from, 1)) translateZ(nth($from, 2));
+      visibility: nth($from, 3);
     }
+
+    50% {
+      transform: #{$rotate}(nth($mid, 1)) translateZ(nth($mid, 2));
+      visibility: nth($mid, 3);
+    }
+
+    100% {
+      transform: #{$rotate}(nth($to, 1)) translateZ(nth($to, 2));
+      visibility: nth($to, 3);
+    }
+  }
+
 }
 
 @mixin slide($name, $axis, $from, $to, $from-vis, $to-vis) {
-    $translate: if($axis =='X', translateX, translateY);
+  $translate: if($axis =='X', translateX, translateY);
 
-    @keyframes #{$name} {
-        from {
-            transform: #{$translate}($from);
-            visibility: $from-vis;
-        }
-
-        to {
-            transform: #{$translate}($to);
-            visibility: $to-vis;
-        }
+  @keyframes #{$name} {
+    from {
+      transform: #{$translate}($from);
+      visibility: $from-vis;
     }
+
+    to {
+      transform: #{$translate}($to);
+      visibility: $to-vis;
+    }
+  }
 }
 
 /**************************************************
@@ -71,21 +72,22 @@ body {
     transform-origin: center;
   }
 
+
   $flips: (
-    flipToLeft-oc:     ('Y', 0deg, -90deg, -180deg, 1px, 0, -1px, visible, hidden, hidden),
-    flipFromLeft-oc:   ('Y', -180deg, -90deg, 0deg, 1px, 0, -1px, hidden, visible, visible),
-    flipToRight-oc:    ('Y', 0deg, 90deg, 180deg, 1px, 0, 1px, visible, hidden, hidden),
-    flipFromRight-oc:  ('Y', 180deg, 90deg, 0deg, 1px, 0, -1px, hidden, visible, visible),
-    flipToTop-oc:      ('X', 0deg, -90deg, -180deg, 1px, 0, -1px, visible, hidden, hidden),
-    flipToBottom-oc:   ('X', 0deg, 90deg, 180deg, 1px, 0, 1px, visible, hidden, hidden),
-    flipFromBottom-oc: ('X', 180deg, 90deg, 0deg, 1px, 0, -1px, hidden, visible, visible),
-    flipFromTop-oc:    ('X', -180deg, -90deg, 0deg, 1px, 0, -1px, hidden, visible, visible)
+    flipToLeft-oc: ('Y', (0deg, 1px, visible), (-90deg, 0, hidden), (-180deg, -1px, hidden)),
+    flipFromLeft-oc: ('Y', (-180deg, 1px, hidden), (-90deg, 0, visible), (0deg, -1px, visible)),
+    flipToRight-oc: ('Y', (0deg, 1px, visible), (90deg, 0, hidden), (180deg, 1px, hidden)),
+    flipFromRight-oc: ('Y', (180deg, 1px, hidden), (90deg, 0, visible), (0deg, -1px, visible)),
+    flipToTop-oc: ('X', (0deg, 1px, visible), (-90deg, 0, hidden), (-180deg, -1px, hidden)),
+    flipToBottom-oc: ('X', (0deg, 1px, visible), (90deg, 0, hidden), (180deg, 1px, hidden)),
+    flipFromBottom-oc: ('X', (180deg, 1px, hidden), (90deg, 0, visible), (0deg, -1px, visible)),
+    flipFromTop-oc: ('X', (-180deg, 1px, hidden), (-90deg, 0, visible), (0deg, -1px, visible))
   );
 
   @each $name, $vals in $flips {
     .#{$name} {
       @include animation($name);
-      @include flip-animation($name, nth($vals, 1), nth($vals, 2), nth($vals, 3), nth($vals, 4), nth($vals, 5), nth($vals, 6), nth($vals, 7), nth($vals, 8), nth($vals, 9), nth($vals, 10));
+      @include flip-animation($name, nth($vals, 1), nth($vals, 2), nth($vals, 3), nth($vals, 4));
     }
   }
 
@@ -104,13 +106,13 @@ body {
   }
 
   $slides: (
-    slideToLeft:    ('X', 0, -100%, visible, hidden),
-    slideFromLeft:  ('X', -100%, 0, visible, visible),
-    slideToRight:   ('X', 0, 100%, visible, hidden),
+    slideToLeft: ('X', 0, -100%, visible, hidden),
+    slideFromLeft: ('X', -100%, 0, visible, visible),
+    slideToRight: ('X', 0, 100%, visible, hidden),
     slideFromRight: ('X', 100%, 0, visible, visible),
-    slideToTop:     ('Y', 0, -100%, visible, hidden),
-    slideFromTop:   ('Y', -100%, 0, visible, visible),
-    slideToBottom:  ('Y', 0, 100%, visible, hidden),
+    slideToTop: ('Y', 0, -100%, visible, hidden),
+    slideFromTop: ('Y', -100%, 0, visible, visible),
+    slideToBottom: ('Y', 0, 100%, visible, hidden),
     slideFromBottom:('Y', 100%, 0, visible, visible)
   );
 
