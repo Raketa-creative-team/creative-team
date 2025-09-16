@@ -1,3 +1,5 @@
+//https://studio-ui.teads.tv/studio/6753877077279498/editor/code/js
+
 const flipFlowConfig = {
 	container: SlideShowContainer,
 	animation: {
