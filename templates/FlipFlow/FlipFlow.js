@@ -1,17 +1,15 @@
-//https://studio-ui.teads.tv/studio/6753877077279498/editor/code/js
-
 const flipFlowConfig = {
 	container: SlideShowContainer,
 	animation: {
 		duration: 0.4,
 		ease: 'ease-in',
 		next: {
-			onShow: 'flipFromRight',
-			onHide: 'flipToLeft',
+			onShow: 'slideFromTop',
+			onHide: 'slideToBottom',
 		},
 		previous: {
-			onShow: 'flipFromTop',
-			onHide: 'slideToBottom',
+			onShow: 'slideFromBottom',
+			onHide: 'slideToTop',
 		}
 	},
 	scroll: {
@@ -56,9 +54,11 @@ function FlipFlow(config) {
 
 	this.setDuration = (duration) => {
 		slides.forEach(slide => {
+			slide.htmlElement.querySelector('.animation').style.animationDuration = `${duration}s`
 			container.getEos(slide).configs.get(bnt.get(bnt.State)).onShow.duration = duration;
 			container.getEos(slide).configs.get(bnt.get(bnt.State)).onHide.duration = duration;
 		})
+
 	}
 
 	this.setEase = (ease) => {
