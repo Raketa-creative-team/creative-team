@@ -6,7 +6,7 @@
 }
 
 @mixin flip-animation($name, $axis, $from, $mid, $to) {
-  $rotate: if($axis =='X', rotateX, rotateY);
+  $rotate: if($axis=='X', rotateX, rotateY);
 
   @keyframes #{$name} {
     0% {
@@ -28,7 +28,7 @@
 }
 
 @mixin slide($name, $axis, $from, $to, $from-vis, $to-vis) {
-  $translate: if($axis =='X', translateX, translateY);
+  $translate: if($axis=='X', translateX, translateY);
 
   @keyframes #{$name} {
     from {
@@ -42,6 +42,52 @@
     }
   }
 }
+
+@mixin absolute-position($name, $left, $right, $top, $bottom) {
+  .#{$name} {
+    overflow: hidden;
+  }
+
+  .#{$name}, .#{$name} * {
+    position: absolute;
+    left: $left;
+    right: $right;
+    top: $top;
+    bottom: $bottom;
+  }
+}
+
+@mixin shrink-animation($name, $axis) {
+  $size: if($axis=='width', width, height);
+
+  @keyframes #{$name} {
+    from {
+      #{$size}: 100%;
+      visibility: visible;
+    }
+
+    to {
+      #{$size}: 0;
+      visibility: hidden;
+    }
+  }
+}
+
+  @mixin expand-animation($name, $axis) {
+    $size: if($axis=='width', width, height);
+
+    @keyframes #{$name} {
+      from {
+        #{$size}: 0;
+        visibility: visible;
+      }
+
+      to {
+        #{$size}: 100%;
+        visibility: visible;
+      }
+    }
+  } 
 
 /**************************************************
     => General Rules
@@ -72,6 +118,37 @@ body {
     transform-origin: center;
   }
 
+  .flipToBackLeft,
+  .flipFromBackLeft,
+  .flipToFrontLeft,
+  .flipFromFrontLeft {
+    backface-visibility: hidden;
+    transform-origin: center left;
+  }
+
+  .flipToBackRight,
+  .flipFromBackRight,
+  .flipToFrontRight,
+  .flipFromFrontRight {
+    backface-visibility: hidden;
+    transform-origin: center right;
+  }
+
+  .flipToBackTop,
+  .flipFromBackTop,
+  .flipToFrontTop,
+  .flipFromFrontTop {
+    backface-visibility: hidden;
+    transform-origin: top center;
+  }
+
+  .flipToBackBottom,
+  .flipFromBackBottom,
+  .flipToFrontBottom,
+  .flipFromFrontBottom {
+    backface-visibility: hidden;
+    transform-origin: bottom center;
+  }
 
   $flips: (
     flipToLeft-oc: ('Y', (0deg, 1px, visible), (-90deg, 0, hidden), (-180deg, -1px, hidden)),
@@ -81,10 +158,26 @@ body {
     flipToTop-oc: ('X', (0deg, 1px, visible), (-90deg, 0, hidden), (-180deg, -1px, hidden)),
     flipToBottom-oc: ('X', (0deg, 1px, visible), (90deg, 0, hidden), (180deg, 1px, hidden)),
     flipFromBottom-oc: ('X', (180deg, 1px, hidden), (90deg, 0, visible), (0deg, -1px, visible)),
-    flipFromTop-oc: ('X', (-180deg, 1px, hidden), (-90deg, 0, visible), (0deg, -1px, visible))
-  );
+    flipFromTop-oc: ('X', (-180deg, 1px, hidden), (-90deg, 0, visible), (0deg, -1px, visible)),
+    flipToBackLeft: ('Y', (0deg, 0, visible), (45deg, 0, visible), (90deg, 0, hidden)),
+    flipFromBackLeft: ('Y', (90deg, 0, hidden), (45deg, 0, visible), (0deg, 0, visible)),
+    flipToFrontLeft: ('Y', (0deg, 0, visible), (-45deg, 0, visible), (-90deg, 0, hidden)),
+    flipFromFrontLeft: ('Y', (-90deg, 0, hidden), (-45deg, 0, visible), (0deg, 0, visible)),
+    flipToBackRight: ('Y', (0deg, 0, visible), (-45deg, 0, visible), (-90deg, 0, hidden)),
+    flipFromBackRight: ('Y', (-90deg, 0, hidden), (-45deg, 0, visible), (0deg, 0, visible)),
+    flipToFrontRight: ('Y', (0deg, 0, visible), (45deg, 0, visible), (90deg, 0, hidden)),
+    flipFromFrontRight: ('Y', (90deg, 0, hidden), (45deg, 0, visible), (0deg, 0, visible)),
+    flipToBackTop: ('X', (0deg, 0, visible), (45deg, 0, visible), (90deg, 0, hidden)),
+    flipFromBackTop: ('X', (90deg, 0, hidden), (45deg, 0, visible), (0deg, 0, visible)),
+    flipToFrontTop: ('X', (0deg, 0, visible), (-45deg, 0, visible), (-90deg, 0, hidden)),
+    flipFromFrontTop: ('X', (-90deg, 0, hidden), (-45deg, 0, visible), (0deg, 0, visible)),
+    flipToBackBottom: ('X', (0deg, 0, visible), (-45deg, 0, visible), (-90deg, 0, hidden)),
+    flipFromBackBottom: ('X', (-90deg, 0, hidden), (-45deg, 0, visible), (0deg, 0, visible)),
+    flipToFrontBottom: ('X', (0deg, 0, visible), (45deg, 0, visible), (90deg, 0, hidden)),
+    flipFromFrontBottom: ('X', (90deg, 0, hidden), (45deg, 0, visible), (0deg, 0, visible)));
 
-  @each $name, $vals in $flips {
+  @each $name,
+  $vals in $flips {
     .#{$name} {
       @include animation($name);
       @include flip-animation($name, nth($vals, 1), nth($vals, 2), nth($vals, 3), nth($vals, 4));
@@ -113,13 +206,55 @@ body {
     slideToTop: ('Y', 0, -100%, visible, hidden),
     slideFromTop: ('Y', -100%, 0, visible, visible),
     slideToBottom: ('Y', 0, 100%, visible, hidden),
-    slideFromBottom:('Y', 100%, 0, visible, visible)
-  );
+    slideFromBottom:('Y', 100%, 0, visible, visible));
 
-  @each $name, $vals in $slides {
+  @each $name,
+  $vals in $slides {
     .#{$name} {
       @include animation($name);
       @include slide($name, nth($vals, 1), nth($vals, 2), nth($vals, 3), nth($vals, 4), nth($vals, 5));
+    }
+  }
+
+  $shrinks: (
+    shrinkToLeft: (0, auto, 0, 0),
+    shrinkToRight: (auto, 0, 0, 0),
+    shrinkToTop: (0, 0, 0, auto),
+    shrinkToBottom: (0, 0, auto, 0)
+  );
+
+  @each $name,
+  $vals in $shrinks {
+    @include absolute-position($name, nth($vals, 1), nth($vals, 2), nth($vals, 3), nth($vals, 4));
+  }
+
+  @each $name,
+  $vals in $shrinks {
+    .#{$name} {
+      @include animation($name);
+      $axis: if(nth($vals, 1)==0 or nth($vals, 2)==0, 'width', 'height');
+      @include shrink-animation($name, $axis);
+    }
+  }
+
+  $expands: (
+    expandFromLeft: (0, auto, 0, 0),
+    expandFromRight: (auto, 0, 0, 0),
+    expandFromTop: (0, 0, 0, auto),
+    expandFromBottom: (0, 0, auto, 0)
+  );
+
+  @each $name,
+  $vals in $expands { 
+    @include absolute-position($name, nth($vals, 1), nth($vals, 2), nth($vals, 3), nth($vals, 4));
+  }
+
+  @each $name,
+  $vals in $expands {
+    .#{$name} {
+      @include animation($name);
+      $axis: if(nth($vals, 1)==0 or nth($vals, 2)==0, 'width', 'height');
+      @include expand-animation($name, $axis);
     }
   }
 }
