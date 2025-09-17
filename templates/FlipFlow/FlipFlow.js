@@ -25,7 +25,7 @@ flipFlowConfig.container.onshowAnimationEnd.addObserver(initFlipFlow);
 function initFlipFlow() {
 	const getPercent = getPlayerBounds(0, 1);
 
-	const config = {...flipFlowConfig, getPercent };
+	const config = { ...flipFlowConfig, getPercent };
 
 	const flipFlow = new FlipFlow(config);
 	flipFlow.start();
@@ -40,7 +40,7 @@ function initFlipFlow() {
 }
 
 function FlipFlow(config) {
-	const {container, getPercent, animation} = config;
+	const { container, getPercent, animation } = config;
 
 	const slides = container.eos.map(eos => eos.element);
 	const len = slides.length;
@@ -187,28 +187,32 @@ function getPlayerBounds(start, end) {
 /************************************************************
 * ==> Check if Display viewable
 ************************************************************/
-if (!creative.screens[0].deepGetEosByType(bnt.Video).length) {
-	bnt.TeadsPlayerAddons.apiProxy.addObserver(function (api) {
-		if (api) {
-			api.getStudioData().map(function (data) {
-				if (data) data.display = true; else data = { display: true };
-				api.setStudioData(data).map(function () {
-					var state = bnt.get(bnt.State);
-					if (state) {
-						api.sendVideoMetadata({ width: state.canvas.config.width, height: state.canvas.config.height });
-					} else {
-						var fixStage = function (state) {
-							api.sendVideoMetadata({ width: state.canvas.config.width, height: state.canvas.config.height }); // force player to resize slot in case it got a different size from the vast tag
-							bnt.get(bnt.StateChangeDetector).stateUpdated.removeObserver(fixStage); // we do this only once -
-						};
-						bnt.get(bnt.StateChangeDetector).stateUpdated.addObserver(fixStage);
-					}
+function addDisplayContext() {
+	if (!creative.screens[0].deepGetEosByType(bnt.Video).length) {
+		bnt.TeadsPlayerAddons.apiProxy.addObserver(function (api) {
+			if (api) {
+				api.getStudioData().map(function (data) {
+					if (data) data.display = true; else data = { display: true };
+					api.setStudioData(data).map(function () {
+						var state = bnt.get(bnt.State);
+						if (state) {
+							api.sendVideoMetadata({ width: state.canvas.config.width, height: state.canvas.config.height });
+						} else {
+							var fixStage = function (state) {
+								api.sendVideoMetadata({ width: state.canvas.config.width, height: state.canvas.config.height }); // force player to resize slot in case it got a different size from the vast tag
+								bnt.get(bnt.StateChangeDetector).stateUpdated.removeObserver(fixStage); // we do this only once -
+							};
+							bnt.get(bnt.StateChangeDetector).stateUpdated.addObserver(fixStage);
+						}
+					});
 				});
-			});
-		}
-		if (window.parent.adApi && window.parent.adApi.bntAd) {
-			window.parent.adApi.bntAd.environment.videoSlot = null;
-		}
-		bnt.TeadsPlayerAddons.brandingModeOnVoidClick = false;
-	});
+			}
+			if (window.parent.adApi && window.parent.adApi.bntAd) {
+				window.parent.adApi.bntAd.environment.videoSlot = null;
+			}
+			bnt.TeadsPlayerAddons.brandingModeOnVoidClick = false;
+		});
+	}
 }
+
+addDisplayContext();
