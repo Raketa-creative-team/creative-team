@@ -49,7 +49,7 @@
   }
 
   .#{$name}, .#{$name} * {
-    position: absolute;
+    position: absolute !important;
     left: $left;
     right: $right;
     top: $top;
@@ -167,14 +167,15 @@ body {
     flipFromBackRight: ('Y', (-90deg, 0, hidden), (-45deg, 0, visible), (0deg, 0, visible)),
     flipToFrontRight: ('Y', (0deg, 0, visible), (45deg, 0, visible), (90deg, 0, hidden)),
     flipFromFrontRight: ('Y', (90deg, 0, hidden), (45deg, 0, visible), (0deg, 0, visible)),
-    flipToBackTop: ('X', (0deg, 0, visible), (45deg, 0, visible), (90deg, 0, hidden)),
-    flipFromBackTop: ('X', (90deg, 0, hidden), (45deg, 0, visible), (0deg, 0, visible)),
-    flipToFrontTop: ('X', (0deg, 0, visible), (-45deg, 0, visible), (-90deg, 0, hidden)),
-    flipFromFrontTop: ('X', (-90deg, 0, hidden), (-45deg, 0, visible), (0deg, 0, visible)),
-    flipToBackBottom: ('X', (0deg, 0, visible), (-45deg, 0, visible), (-90deg, 0, hidden)),
-    flipFromBackBottom: ('X', (-90deg, 0, hidden), (-45deg, 0, visible), (0deg, 0, visible)),
-    flipToFrontBottom: ('X', (0deg, 0, visible), (45deg, 0, visible), (90deg, 0, hidden)),
-    flipFromFrontBottom: ('X', (90deg, 0, hidden), (45deg, 0, visible), (0deg, 0, visible)));
+    flipToBackTop: ('X', (0deg, 0, visible), (-45deg, 0, visible), (-90deg, 0, hidden)),
+    flipFromBackTop: ('X', (-90deg, 0, hidden), (-45deg, 0, visible), (0deg, 0, visible)),
+    flipToFrontTop: ('X', (0deg, 0, visible), (45deg, 0, visible), (90deg, 0, hidden)),
+    flipFromFrontTop: ('X', (90deg, 0, hidden), (45deg, 0, visible), (0deg, 0, visible)),
+    flipToBackBottom: ('X', (0deg, 0, visible), (-45deg, 0, visible), (-90deg, 0, hidden)), 
+    flipFromBackBottom: ('X', (-90deg, 0, hidden), (-45deg, 0, visible), (0deg, 0, visible)), 
+    flipToFrontBottom: ('X', (0deg, 0, visible), (-45deg, 0, visible), (-90deg, 0, hidden)),
+    flipFromFrontBottom: ('X', (-90deg, 0, hidden), (-45deg, 0, visible), (0deg, 0, visible))
+    );
 
   @each $name,
   $vals in $flips {
@@ -232,7 +233,7 @@ body {
   $vals in $shrinks {
     .#{$name} {
       @include animation($name);
-      $axis: if(nth($vals, 1)==0 or nth($vals, 2)==0, 'width', 'height');
+      $axis: if(nth($vals, 1)==0 and nth($vals, 2)==0, 'height', 'width');
       @include shrink-animation($name, $axis);
     }
   }
@@ -253,7 +254,7 @@ body {
   $vals in $expands {
     .#{$name} {
       @include animation($name);
-      $axis: if(nth($vals, 1)==0 or nth($vals, 2)==0, 'width', 'height');
+      $axis: if(nth($vals, 1)==0 and nth($vals, 2)==0, 'height', 'width');
       @include expand-animation($name, $axis);
     }
   }
