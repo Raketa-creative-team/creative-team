@@ -178,26 +178,36 @@ function getPercentParams(config) {
 function getMousePercent(element) {
 	const events = getEventsType();
 	const getCoords = getEventCoords();
- 
+
 	const totalWidth = element.htmlElement.offsetWidth;
-	const offset = Math.round(totalWidth / 100) * 5; // Maybe we need better here
- 
+
 	let startingXY = undefined;
 	let percent = 0;
- 
-	element.htmlElement.addEventListener(events.pointerDown, (evt) => { startingXY = getCoords(evt) });
-	element.htmlElement.addEventListener(events.pointerUp, (evt) => { startingXY = undefined });
-	element.htmlElement.addEventListener(events.pointerCancel, (evt) => { startingXY = undefined });
- 
+	let startPercent = 0;
+
+	element.htmlElement.addEventListener(events.pointerDown, (evt) => {
+		startingXY = getCoords(evt);
+		startPercent = percent;
+	});
+
+	element.htmlElement.addEventListener(events.pointerUp, () => { startingXY = undefined; });
+	element.htmlElement.addEventListener(events.pointerCancel, () => { startingXY = undefined; });
+
 	element.htmlElement.addEventListener(events.pointerMove, (evt) => {
 		if (!startingXY) return;
- 
+
 		const currentXY = getCoords(evt);
-		const adjustedX = remapRange(currentXY.x, [offset, totalWidth - offset], [0, totalWidth]);
- 
-		percent = adjustedX / totalWidth;
+		const deltaX = currentXY.x - startingXY.x;
+
+		const newPercent = startPercent + deltaX / totalWidth;
+		const loopedPercent = ((newPercent % 1) + 1) % 1;
+
+		percent = loopedPercent;
+
+		startingXY = currentXY;
+		startPercent = percent;
 	});
- 
+
 	return function () { return percent; }
 }
  
