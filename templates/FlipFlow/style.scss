@@ -171,8 +171,8 @@ body {
     flipFromBackTop: ('X', (-90deg, 0, hidden), (-45deg, 0, visible), (0deg, 0, visible)),
     flipToFrontTop: ('X', (0deg, 0, visible), (45deg, 0, visible), (90deg, 0, hidden)),
     flipFromFrontTop: ('X', (90deg, 0, hidden), (45deg, 0, visible), (0deg, 0, visible)),
-    flipToBackBottom: ('X', (0deg, 0, visible), (-45deg, 0, visible), (-90deg, 0, hidden)), 
-    flipFromBackBottom: ('X', (-90deg, 0, hidden), (-45deg, 0, visible), (0deg, 0, visible)), 
+    flipToBackBottom: ('X', (0deg, 0, visible), (45deg, 0, visible), (90deg, 0, hidden)), 
+    flipFromBackBottom: ('X', (90deg, 0, hidden), (45deg, 0, visible), (0deg, 0, visible)), 
     flipToFrontBottom: ('X', (0deg, 0, visible), (-45deg, 0, visible), (-90deg, 0, hidden)),
     flipFromFrontBottom: ('X', (-90deg, 0, hidden), (-45deg, 0, visible), (0deg, 0, visible))
     );

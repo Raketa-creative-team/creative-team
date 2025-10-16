@@ -402,11 +402,11 @@ body {
     visibility: visible;
   }
   50% {
-    transform: rotateX(-45deg) translateZ(0);
+    transform: rotateX(45deg) translateZ(0);
     visibility: visible;
   }
   100% {
-    transform: rotateX(-90deg) translateZ(0);
+    transform: rotateX(90deg) translateZ(0);
     visibility: hidden;
   }
 }
@@ -415,11 +415,11 @@ body {
 }
 @keyframes flipFromBackBottom {
   0% {
-    transform: rotateX(-90deg) translateZ(0);
+    transform: rotateX(90deg) translateZ(0);
     visibility: hidden;
   }
   50% {
-    transform: rotateX(-45deg) translateZ(0);
+    transform: rotateX(45deg) translateZ(0);
     visibility: visible;
   }
   100% {
