@@ -5,7 +5,7 @@
   animation-name: $name;
 }
 
-@mixin flip-animation($name, $axis, $from, $mid, $to) {
+@mixin flip-animation($name, $axis, $from, $to) {
   $rotate: if($axis=='X', rotateX, rotateY);
 
   @keyframes #{$name} {
@@ -14,10 +14,10 @@
       visibility: nth($from, 3);
     }
 
-    50% {
-      transform: #{$rotate}(nth($mid, 1)) translateZ(nth($mid, 2));
-      visibility: nth($mid, 3);
-    }
+    // 50% {
+    //   transform: #{$rotate}(nth($mid, 1)) translateZ(nth($mid, 2));
+    //   visibility: nth($mid, 3);
+    // }
 
     100% {
       transform: #{$rotate}(nth($to, 1)) translateZ(nth($to, 2));
@@ -101,6 +101,7 @@ body {
 
   * {
     transform-style: preserve-3d;
+    backface-visibility: hidden;
   }
 
   // ======================
@@ -151,37 +152,37 @@ body {
   }
 
   $flips: (
-    flipToLeft-oc: ('Y', (0deg, 1px, visible), (-90deg, 0, hidden), (-180deg, -1px, hidden)),
-    flipFromLeft-oc: ('Y', (-180deg, 1px, hidden), (-90deg, 0, visible), (0deg, -1px, visible)),
-    flipToRight-oc: ('Y', (0deg, 1px, visible), (90deg, 0, hidden), (180deg, 1px, hidden)),
-    flipFromRight-oc: ('Y', (180deg, 1px, hidden), (90deg, 0, visible), (0deg, -1px, visible)),
-    flipToTop-oc: ('X', (0deg, 1px, visible), (-90deg, 0, hidden), (-180deg, -1px, hidden)),
-    flipToBottom-oc: ('X', (0deg, 1px, visible), (90deg, 0, hidden), (180deg, 1px, hidden)),
-    flipFromBottom-oc: ('X', (180deg, 1px, hidden), (90deg, 0, visible), (0deg, -1px, visible)),
-    flipFromTop-oc: ('X', (-180deg, 1px, hidden), (-90deg, 0, visible), (0deg, -1px, visible)),
-    flipToBackLeft: ('Y', (0deg, 0, visible), (45deg, 0, visible), (90deg, 0, hidden)),
-    flipFromBackLeft: ('Y', (90deg, 0, hidden), (45deg, 0, visible), (0deg, 0, visible)),
-    flipToFrontLeft: ('Y', (0deg, 0, visible), (-45deg, 0, visible), (-90deg, 0, hidden)),
-    flipFromFrontLeft: ('Y', (-90deg, 0, hidden), (-45deg, 0, visible), (0deg, 0, visible)),
-    flipToBackRight: ('Y', (0deg, 0, visible), (-45deg, 0, visible), (-90deg, 0, hidden)),
-    flipFromBackRight: ('Y', (-90deg, 0, hidden), (-45deg, 0, visible), (0deg, 0, visible)),
-    flipToFrontRight: ('Y', (0deg, 0, visible), (45deg, 0, visible), (90deg, 0, hidden)),
-    flipFromFrontRight: ('Y', (90deg, 0, hidden), (45deg, 0, visible), (0deg, 0, visible)),
-    flipToBackTop: ('X', (0deg, 0, visible), (-45deg, 0, visible), (-90deg, 0, hidden)),
-    flipFromBackTop: ('X', (-90deg, 0, hidden), (-45deg, 0, visible), (0deg, 0, visible)),
-    flipToFrontTop: ('X', (0deg, 0, visible), (45deg, 0, visible), (90deg, 0, hidden)),
-    flipFromFrontTop: ('X', (90deg, 0, hidden), (45deg, 0, visible), (0deg, 0, visible)),
-    flipToBackBottom: ('X', (0deg, 0, visible), (45deg, 0, visible), (90deg, 0, hidden)), 
-    flipFromBackBottom: ('X', (90deg, 0, hidden), (45deg, 0, visible), (0deg, 0, visible)), 
-    flipToFrontBottom: ('X', (0deg, 0, visible), (-45deg, 0, visible), (-90deg, 0, hidden)),
-    flipFromFrontBottom: ('X', (-90deg, 0, hidden), (-45deg, 0, visible), (0deg, 0, visible))
+    flipToLeft-oc: ('Y', (0deg, 1px, visible), (-180deg, -1px, hidden)),
+    flipFromLeft-oc: ('Y', (-180deg, 1px, hidden), (0deg, -1px, visible)),
+    flipToRight-oc: ('Y', (0deg, 1px, visible), (180deg, 1px, hidden)),
+    flipFromRight-oc: ('Y', (180deg, 1px, hidden), (0deg, -1px, visible)),
+    flipToTop-oc: ('X', (0deg, 1px, visible), (-180deg, -1px, hidden)),
+    flipToBottom-oc: ('X', (0deg, 1px, visible), (180deg, 1px, hidden)),
+    flipFromBottom-oc: ('X', (180deg, 1px, hidden), (0deg, -1px, visible)),
+    flipFromTop-oc: ('X', (-180deg, 1px, hidden), (0deg, -1px, visible)),
+    flipToBackLeft: ('Y', (0deg, 0, visible), (90deg, 0, hidden)),
+    flipFromBackLeft: ('Y', (90deg, 0, hidden), (0deg, 0, visible)),
+    flipToFrontLeft: ('Y', (0deg, 0, visible), (-90deg, 0, hidden)),
+    flipFromFrontLeft: ('Y', (-90deg, 0, hidden), (0deg, 0, visible)),
+    flipToBackRight: ('Y', (0deg, 0, visible), (-90deg, 0, hidden)),
+    flipFromBackRight: ('Y', (-90deg, 0, hidden), (0deg, 0, visible)),
+    flipToFrontRight: ('Y', (0deg, 0, visible), (90deg, 0, hidden)),
+    flipFromFrontRight: ('Y', (90deg, 0, hidden), (0deg, 0, visible)),
+    flipToBackTop: ('X', (0deg, 0, visible), (-90deg, 0, hidden)),
+    flipFromBackTop: ('X', (-90deg, 0, hidden), (0deg, 0, visible)),
+    flipToFrontTop: ('X', (0deg, 0, visible), (90deg, 0, hidden)),
+    flipFromFrontTop: ('X', (90deg, 0, hidden), (0deg, 0, visible)),
+    flipToBackBottom: ('X', (0deg, 0, visible), (90deg, 0, hidden)), 
+    flipFromBackBottom: ('X', (90deg, 0, hidden), (0deg, 0, visible)), 
+    flipToFrontBottom: ('X', (0deg, 0, visible), (-90deg, 0, hidden)),
+    flipFromFrontBottom: ('X', (-90deg, 0, hidden), (0deg, 0, visible))
     );
 
   @each $name,
   $vals in $flips {
     .#{$name} {
       @include animation($name);
-      @include flip-animation($name, nth($vals, 1), nth($vals, 2), nth($vals, 3), nth($vals, 4));
+      @include flip-animation($name, nth($vals, 1), nth($vals, 2), nth($vals, 3));
     }
   }
 
