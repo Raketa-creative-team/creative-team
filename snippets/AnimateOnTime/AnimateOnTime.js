@@ -9,6 +9,24 @@ const timelineConfig = {
     ]
 }
 
+adController.onstart.addObserver(() => setPrerenderPosition(timelineConfig))
+
+function setPrerenderPosition(config) {
+    const { screen } = config;
+    const configs = getConfigsById(config);
+
+    configs.forEach(conf => {
+        const firstStep = conf.steps.sort((a, b) => a.triggerAt - b.triggerAt)[0]
+
+        if (firstStep.triggerAt !== 0) return;
+
+        const state = screen.getEos(firstStep.name).configs.get(bnt.get(bnt.State));
+        const statePos = { x: parseInt(firstStep.left), y: parseInt(firstStep.top) };
+
+        Object.assign(state, statePos)
+    })
+}
+
 timelineConfig.screen.onshow.addObserver(() => initTimeline(timelineConfig));
 
 function initTimeline(config) {
@@ -50,20 +68,23 @@ function getTime(screen) {
     else return screen.timeMillisec.value;
 }
 
-
 function AnimTimeline(config) {
     const { transitionDuration, steps } = config;
-    let lastTrigger;
 
-    const initialState = {
-        name: steps[0].name,
-        triggerAt: 1,
-        top: steps[0].name.htmlElement.style.top,
-        left: steps[0].name.htmlElement.style.left,
-        width: steps[0].name.htmlElement.offsetWidth + 'px',
+    let lastTrigger = 0;
+
+    this.setDefaultStep = () => {
+        const initialState = {
+            name: steps[0].name,
+            triggerAt: 0,
+            top: steps[0].name.htmlElement.style.top,
+            left: steps[0].name.htmlElement.style.left,
+            width: steps[0].name.htmlElement.offsetWidth + 'px',
+        }
+
+        const firstStep = steps.sort((a, b) => a.triggerAt - b.triggerAt)[0];
+        if (firstStep !== 0) steps.push(initialState);
     }
-
-    steps.push(initialState);
 
     this.fixSize = (element) => {
         const height = element.htmlElement.offsetHeight + 'px';
@@ -105,6 +126,7 @@ function AnimTimeline(config) {
 
     this.animate = (trigger) => {
         const nextStep = this.getNextStep(trigger);
+
         if (!nextStep) return
 
         if (nextStep.triggerAt === lastTrigger) return;
@@ -114,6 +136,7 @@ function AnimTimeline(config) {
         nextStep.name.htmlElement.classList.add('in-transition')
     };
 
+    this.setDefaultStep();
     this.fixSize(steps[0].name);
     this.setTrasition(steps);
 }
