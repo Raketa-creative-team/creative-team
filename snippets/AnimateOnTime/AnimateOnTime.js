@@ -1,4 +1,4 @@
-// https://studio-ui.teads.tv/studio/6753877077300297/editor/code/js
+//https://studio-ui.teads.tv/studio/6753877077300297/editor/code/js
 
 const timelineConfig = {
     screen: Screen1,
@@ -133,7 +133,6 @@ function AnimTimeline(config) {
         lastTrigger = nextStep.triggerAt;
 
         this.updateStyle(nextStep);
-        nextStep.name.htmlElement.classList.add('in-transition')
     };
 
     this.setDefaultStep();
