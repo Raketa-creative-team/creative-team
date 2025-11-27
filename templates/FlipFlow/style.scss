@@ -1,0 +1,262 @@
+/**************************************************
+    => Mixins
+**************************************************/
+@mixin animation($name) {
+  animation-name: $name;
+}
+
+@mixin flip-animation($name, $axis, $from, $to) {
+  $rotate: if($axis=='X', rotateX, rotateY);
+
+  @keyframes #{$name} {
+    0% {
+      transform: #{$rotate}(nth($from, 1)) translateZ(nth($from, 2));
+      visibility: nth($from, 3);
+    }
+
+    // 50% {
+    //   transform: #{$rotate}(nth($mid, 1)) translateZ(nth($mid, 2));
+    //   visibility: nth($mid, 3);
+    // }
+
+    100% {
+      transform: #{$rotate}(nth($to, 1)) translateZ(nth($to, 2));
+      visibility: nth($to, 3);
+    }
+  }
+
+}
+
+@mixin slide($name, $axis, $from, $to, $from-vis, $to-vis) {
+  $translate: if($axis=='X', translateX, translateY);
+
+  @keyframes #{$name} {
+    from {
+      transform: #{$translate}($from);
+      visibility: $from-vis;
+    }
+
+    to {
+      transform: #{$translate}($to);
+      visibility: $to-vis;
+    }
+  }
+}
+
+@mixin absolute-position($name, $left, $right, $top, $bottom) {
+  .#{$name} {
+    overflow: hidden;
+  }
+
+  .#{$name}, .#{$name} * {
+    position: absolute !important;
+    left: $left;
+    right: $right;
+    top: $top;
+    bottom: $bottom;
+  }
+}
+
+@mixin shrink-animation($name, $axis) {
+  $size: if($axis=='width', width, height);
+
+  @keyframes #{$name} {
+    from {
+      #{$size}: 100%;
+      visibility: visible;
+    }
+
+    to {
+      #{$size}: 0;
+      visibility: hidden;
+    }
+  }
+}
+
+  @mixin expand-animation($name, $axis) {
+    $size: if($axis=='width', width, height);
+
+    @keyframes #{$name} {
+      from {
+        #{$size}: 0;
+        visibility: visible;
+      }
+
+      to {
+        #{$size}: 100%;
+        visibility: visible;
+      }
+    }
+  } 
+
+/**************************************************
+    => General Rules
+**************************************************/
+body {
+  background-color: white;
+}
+
+.ss {
+  perspective: 1000px;
+
+  * {
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+  }
+
+  // ======================
+  // Flip animations
+  // ======================
+  .flipToLeft-oc,
+  .flipToRight-oc,
+  .flipFromLeft-oc,
+  .flipFromRight-oc,
+  .flipToTop-oc,
+  .flipToBottom-oc,
+  .flipFromTop-oc,
+  .flipFromBottom-oc {
+    backface-visibility: hidden;
+    transform-origin: center;
+  }
+
+  .flipToBackLeft,
+  .flipFromBackLeft,
+  .flipToFrontLeft,
+  .flipFromFrontLeft {
+    backface-visibility: hidden;
+    transform-origin: center left;
+  }
+
+  .flipToBackRight,
+  .flipFromBackRight,
+  .flipToFrontRight,
+  .flipFromFrontRight {
+    backface-visibility: hidden;
+    transform-origin: center right;
+  }
+
+  .flipToBackTop,
+  .flipFromBackTop,
+  .flipToFrontTop,
+  .flipFromFrontTop {
+    backface-visibility: hidden;
+    transform-origin: top center;
+  }
+
+  .flipToBackBottom,
+  .flipFromBackBottom,
+  .flipToFrontBottom,
+  .flipFromFrontBottom {
+    backface-visibility: hidden;
+    transform-origin: bottom center;
+  }
+
+  $flips: (
+    flipToLeft-oc: ('Y', (0deg, 1px, visible), (-180deg, -1px, hidden)),
+    flipFromLeft-oc: ('Y', (-180deg, 1px, hidden), (0deg, -1px, visible)),
+    flipToRight-oc: ('Y', (0deg, 1px, visible), (180deg, 1px, hidden)),
+    flipFromRight-oc: ('Y', (180deg, 1px, hidden), (0deg, -1px, visible)),
+    flipToTop-oc: ('X', (0deg, 1px, visible), (-180deg, -1px, hidden)),
+    flipToBottom-oc: ('X', (0deg, 1px, visible), (180deg, 1px, hidden)),
+    flipFromBottom-oc: ('X', (180deg, 1px, hidden), (0deg, -1px, visible)),
+    flipFromTop-oc: ('X', (-180deg, 1px, hidden), (0deg, -1px, visible)),
+    flipToBackLeft: ('Y', (0deg, 0, visible), (90deg, 0, hidden)),
+    flipFromBackLeft: ('Y', (90deg, 0, hidden), (0deg, 0, visible)),
+    flipToFrontLeft: ('Y', (0deg, 0, visible), (-90deg, 0, hidden)),
+    flipFromFrontLeft: ('Y', (-90deg, 0, hidden), (0deg, 0, visible)),
+    flipToBackRight: ('Y', (0deg, 0, visible), (-90deg, 0, hidden)),
+    flipFromBackRight: ('Y', (-90deg, 0, hidden), (0deg, 0, visible)),
+    flipToFrontRight: ('Y', (0deg, 0, visible), (90deg, 0, hidden)),
+    flipFromFrontRight: ('Y', (90deg, 0, hidden), (0deg, 0, visible)),
+    flipToBackTop: ('X', (0deg, 0, visible), (-90deg, 0, hidden)),
+    flipFromBackTop: ('X', (-90deg, 0, hidden), (0deg, 0, visible)),
+    flipToFrontTop: ('X', (0deg, 0, visible), (90deg, 0, hidden)),
+    flipFromFrontTop: ('X', (90deg, 0, hidden), (0deg, 0, visible)),
+    flipToBackBottom: ('X', (0deg, 0, visible), (90deg, 0, hidden)), 
+    flipFromBackBottom: ('X', (90deg, 0, hidden), (0deg, 0, visible)), 
+    flipToFrontBottom: ('X', (0deg, 0, visible), (-90deg, 0, hidden)),
+    flipFromFrontBottom: ('X', (-90deg, 0, hidden), (0deg, 0, visible))
+    );
+
+  @each $name,
+  $vals in $flips {
+    .#{$name} {
+      @include animation($name);
+      @include flip-animation($name, nth($vals, 1), nth($vals, 2), nth($vals, 3));
+    }
+  }
+
+  // ======================
+  // Slide animations
+  // ======================
+  .slideToLeft,
+  .slideFromLeft,
+  .slideToRight,
+  .slideFromRight,
+  .slideToTop,
+  .slideFromTop,
+  .slideToBottom,
+  .slideFromBottom {
+    transform-origin: center;
+  }
+
+  $slides: (
+    slideToLeft: ('X', 0, -100%, visible, hidden),
+    slideFromLeft: ('X', -100%, 0, visible, visible),
+    slideToRight: ('X', 0, 100%, visible, hidden),
+    slideFromRight: ('X', 100%, 0, visible, visible),
+    slideToTop: ('Y', 0, -100%, visible, hidden),
+    slideFromTop: ('Y', -100%, 0, visible, visible),
+    slideToBottom: ('Y', 0, 100%, visible, hidden),
+    slideFromBottom:('Y', 100%, 0, visible, visible));
+
+  @each $name,
+  $vals in $slides {
+    .#{$name} {
+      @include animation($name);
+      @include slide($name, nth($vals, 1), nth($vals, 2), nth($vals, 3), nth($vals, 4), nth($vals, 5));
+    }
+  }
+
+  $shrinks: (
+    shrinkToLeft: (0, auto, 0, 0),
+    shrinkToRight: (auto, 0, 0, 0),
+    shrinkToTop: (0, 0, 0, auto),
+    shrinkToBottom: (0, 0, auto, 0)
+  );
+
+  @each $name,
+  $vals in $shrinks {
+    @include absolute-position($name, nth($vals, 1), nth($vals, 2), nth($vals, 3), nth($vals, 4));
+  }
+
+  @each $name,
+  $vals in $shrinks {
+    .#{$name} {
+      @include animation($name);
+      $axis: if(nth($vals, 1)==0 and nth($vals, 2)==0, 'height', 'width');
+      @include shrink-animation($name, $axis);
+    }
+  }
+
+  $expands: (
+    expandFromLeft: (0, auto, 0, 0),
+    expandFromRight: (auto, 0, 0, 0),
+    expandFromTop: (0, 0, 0, auto),
+    expandFromBottom: (0, 0, auto, 0)
+  );
+
+  @each $name,
+  $vals in $expands { 
+    @include absolute-position($name, nth($vals, 1), nth($vals, 2), nth($vals, 3), nth($vals, 4));
+  }
+
+  @each $name,
+  $vals in $expands {
+    .#{$name} {
+      @include animation($name);
+      $axis: if(nth($vals, 1)==0 and nth($vals, 2)==0, 'height', 'width');
+      @include expand-animation($name, $axis);
+    }
+  }
+}
