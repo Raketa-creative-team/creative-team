@@ -11,7 +11,7 @@ const hoverConfig = {
         hoverIconTime: 2000,                //  Milliseconds before hint reappears after user stops interacting (false = never reappear)
         autoRevealOnThreshold: true,        // If true, automatically hide container and fully reveal backImage when threshold is reached
         revealThreshold: 70,                // Percentage (0-100) of canvas area that must be revealed to trigger autoReveal
-        interactionType: "drag",            // "drag" = mouse down + move | "hover" = movement only (no click required)
+        interactionType: "hover",            // "drag" = mouse down + move | "hover" = movement only (no click required)
     },
 
     smoke: {
