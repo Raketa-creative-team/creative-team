@@ -5,8 +5,8 @@
  *****************************************/
 var soundConfig = {
     css: {
-        'left': 60, //Position on X axis. Leave just the quotes for default
-        'top': 60, //Position on Y axis. Leave just the quotes for default
+        'left': '60', //Position on X axis. Leave just the quotes for default
+        'top': '60', //Position on Y axis. Leave just the quotes for default
         'background-image': 'blackSoundIcon_svg', //Name of the svg file goes between the quotes. Leave just the quotes if you don't wish to change sound color
     },
     'screensToHideSoundIcon': [Screen1, Screen2], //Name of the screens the sound icon should not be displayed; Separate them with comma. Leave it empty for default
@@ -19,18 +19,16 @@ var soundConfig = {
 function getCss(config) {
     const clone = new Map(Object.entries(config));
 
-    const isNumber = prop => typeof prop === 'number';
-
     function scaleProp(prop) {
-        if (!isNumber(prop)) return prop;
-
+        if (isNaN(prop)) return prop;
         const scale = window.innerWidth / creative.canvases[0].config.width;
-        return prop * scale;
+
+        return parseInt(prop) * scale;
     }
 
     function addPx(prop) {
-        if (!isNumber(prop)) return prop;
-
+        if (isNaN(prop)) return prop;
+        
         return prop + 'px';
     }
 
@@ -60,9 +58,9 @@ const getTeadsApi = () => {
 function addSoundIcon(config) {
     const { css, screensToHideSoundIcon, videosToShowSoundIconOn } = config;
 
-    const soundBtnHiddenCss = { left: 2000, top: 2000 }
-    const additionalCss = {right: 'auto', bottom: 'auto', transform: 'translateX(-50%) translateY(-50%)', padding: '10px 8px'}
-    const soundBntVisibleCss = { ...css, ... additionalCss }
+    const soundBtnHiddenCss = {display: 'none', width: 10 }
+    const additionalCss = { right: 'auto', bottom: 'auto', transform: 'translateX(-50%) translateY(-50%)', padding: '10px 8px' }
+    const soundBntVisibleCss = { ...css, ...additionalCss }
 
     delete soundBntVisibleCss['background-image'];
 
@@ -80,21 +78,21 @@ function addSoundIcon(config) {
 
     const soundIconVisibleCN = `.icon-muteoff, .icon-muteon ${getCss(soundIconVisbleCss)}`;
 
-    // Apply custom sound icon if screen1 does not has other rulles
+    // Apply custom sound icon if screen1 does not have other rules
     teadsApi.callPlayerApiMethod('customizeUI', [soundBtnVissibleCN + soundIconVisibleCN]);
 
-    hideSound = () => { teadsApi.callPlayerApiMethod('customizeUI', [soundBtnHiddenCN]); console.log('asas')}
+    hideSound = () => { teadsApi.callPlayerApiMethod('customizeUI', [soundBtnHiddenCN]); console.log('asas') }
     showSound = () => teadsApi.callPlayerApiMethod('customizeUI', [soundBtnVissibleCN + soundIconVisibleCN])
 
     screensToHideSoundIcon.forEach(screen => {
-        screen.onshow.addObserver(hideSound, {once: true});
-        screen.onhide.addObserver(showSound, {once: true});
+        screen.onshow.addObserver(hideSound);
+        screen.onhide.addObserver(showSound);
     })
 
     videosToShowSoundIconOn.forEach(video => {
-        video.onplay.addObserver(showSound, {once: true});
-        video.onpause.addObserver(hideSound, {once: true});
-        video.onend.addObserver(hideSound, {once: true});
+        video.onplay.addObserver(showSound);
+        video.onpause.addObserver(hideSound);
+        video.onend.addObserver(hideSound);
     })
 }
 
