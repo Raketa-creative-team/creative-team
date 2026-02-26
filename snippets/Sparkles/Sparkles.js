@@ -7,7 +7,7 @@
  * size:      scale multiplier (0.5 = 50% of original asset size, 1 = 100%).
  * opacity:   transparency range (0 = invisible, 1 = fully opaque);'start' is the baseline; it fades in/out based on duration.
  * rotations: range of the rotation arc in DEGREES. Note: 90 = quarter turn, 180 = half turn, 360 = full circle.
- * duration:  the time (in seconds) for one complete cycle.
+ * duration:  the time (in ms) for one complete cycle.
  * density:   total number of sparkle instances to be rendered on canvas.
  * delay:     the stagger time (in ms) between the appearance of each sparkle.
  ******************************/
@@ -15,19 +15,22 @@
 const sparklesConfig = {
     htmlBox: sparkles_canvas, // Name of your htmlBox here
     images: [
-        { name: 'pacman_png', size: { min: 0.1, max: 1 }, opacity: { start: 0, end: 1 }, rotations: { start: 0, end: 360 }, duration: 3 },
-        { name: 'ellipse1_png', size: { min: 0.2, max: 0.9 }, opacity: { start: 0, end: 0.9 }, rotations: { start: 0, end: 180 }, duration: 3 },
-        { name: 'icon_1639167753744_151_png', size: { min: 0.2, max: 1 }, opacity: { start: 0, end: 0.8 }, rotations: { start: 0, end: 90 }, duration: 1.5},
-        { name: 'icon_png', size: { min: 0.2, max: 0.8 }, opacity: { start: 0, end: 1 }, rotations: { start: 0, end: 90 }, duration: 1.5 }
+        // { name: 'pacman_png', size: { min: 0.1, max: 1 }, opacity: { min: 0, max: 1 }, rotations: { min: 0, max: 360 }, duration: 1000 },
+        { name: 'ellipse1_png', size: { min: 0, max: 1 }, opacity: { min: 0, max: 1 }, rotations: { min: 0, max: 180 }, duration: 1000 },
+        // { name: 'icon_1639167753744_151_png', size: { min: 0.2, max: 1 }, opacity: { min: 0, max: 0.8 }, rotations: { min: 0, max: 90 }, duration: 1500 },
+        // { name: 'icon_png', size: { min: 0.2, max: 0.8 }, opacity: { min: 0, max: 1 }, rotations: { min: 0, max: 90 }, duration: 2500 }
     ],
-    density: 20,
-    delay: 50,
+    density: 400,
+    delay: 150,
 }
 
 sparklesConfig.htmlBox.onshowAnimationEnd.addObserver(function () {
+    keepOnScreens(sparklesConfig.htmlBox);
+
     initSparkle(sparklesConfig);
     sparklesConfig.htmlBox.onshowAnimationEnd.removeObserver(arguments.callee);
 });
+
 
 async function initSparkle(config) {
     const {
@@ -37,16 +40,18 @@ async function initSparkle(config) {
         delay,
     } = config;
 
-    const canvas = createCvsElement(htmlBox);
+    const canvas = createCanvas(htmlBox);
 
-    setCanvasSize(canvas);
+    setCanvasSize(canvas, htmlBox);
 
     const ctx = canvas.getContext('2d');
 
     const loadImages = images.map(img => getAsset(img));
+
     const loadedAssets = await Promise.all(loadImages);
 
     const listCount = Math.ceil(density / loadImages.length);
+
     const densityList = new Array(listCount).fill(loadedAssets).flat().slice(0, density);
 
     let bntLoop;
@@ -83,7 +88,7 @@ async function initSparkle(config) {
     htmlBox.onhideAnimationEnd.addObserver(function () { stopLoop(bntLoop) })
 }
 
-function Sparkle({ ctx, canvas, asset, imgConfig, startDelay }) {
+function Sparkle({ ctx, canvas, asset, imgConfig }) {
 
     const { size, opacity, rotations, duration } = imgConfig;
 
@@ -96,10 +101,10 @@ function Sparkle({ ctx, canvas, asset, imgConfig, startDelay }) {
 
         if (playStatus === false) stopwatch.pause();
         if (playStatus === true) stopwatch.play();
-     }
+    }
 
     this.getFromRange = (size) => {
-        return Math.random() * (size.max - size.min) + size.min
+        return Math.random() * (size.max - size.min) + size.min;
     }
 
     this.getSize = (asset, scale) => {
@@ -120,25 +125,20 @@ function Sparkle({ ctx, canvas, asset, imgConfig, startDelay }) {
         return 1 - Math.abs(2 * percent - 1)
     }
 
-    this.getDimension = (dimension) => {
-        return dimension.start + (dimension.end - dimension.start)
-    }
-
     const scale = this.getFromRange(size);
-    const wh = this.getSize(asset, scale);
+    const assetSize = this.getSize(asset, scale);
 
-    const durationMs = duration * 1000;
+    const alpha = this.getFromRange(opacity);
+    const angle = this.getFromRange(rotations);
 
     let coords = this.getCoords(canvas);
 
     let currentOpacity, currentRotation;
 
-
-
     this.updateSparkle = () => {
         const time = stopwatch.getTime();
 
-        let percent = time / durationMs;
+        let percent = time / duration;
 
         if (percent > 1) {
             stopwatch.stop();
@@ -150,8 +150,8 @@ function Sparkle({ ctx, canvas, asset, imgConfig, startDelay }) {
 
         const rPercent = this.remapPercent(percent);
 
-        currentOpacity = this.getDimension(opacity) * rPercent;
-        currentRotation = this.getDimension(rotations) * rPercent;
+        currentOpacity = alpha * rPercent;
+        currentRotation = angle * percent;
     };
 
     this.drawSparkle = () => {
@@ -159,7 +159,7 @@ function Sparkle({ ctx, canvas, asset, imgConfig, startDelay }) {
         ctx.globalAlpha = currentOpacity;
         ctx.translate(coords.x, coords.y);
         ctx.rotate((currentRotation * Math.PI) / 180);
-        ctx.drawImage(asset, -wh.width / 2, -wh.height / 2, wh.width, wh.height);
+        ctx.drawImage(asset, -assetSize.width / 2, -assetSize.height / 2, assetSize.width, assetSize.height);
         ctx.restore();
     };
 
@@ -169,10 +169,6 @@ function Sparkle({ ctx, canvas, asset, imgConfig, startDelay }) {
         this.updateSparkle();
         this.drawSparkle();
     };
-}
-
-function sortImages(images) {
-    return images.sort()
 }
 
 function getAsset(el) {
@@ -191,18 +187,30 @@ function getAsset(el) {
     })
 }
 
-function setCanvasSize(canvas) {
-    canvas.width = creative.canvases[0].config.width;
-    canvas.height = creative.canvases[0].config.height;
+function setCanvasSize(canvas, htmlBox) {
+    canvas.width = htmlBox.htmlElement.offsetWidth;
+    canvas.height = htmlBox.htmlElement.offsetHeight;
 
     canvas.style.position = "absolute";
     canvas.style.top = 0;
 }
 
-function createCvsElement(htmlBox) {
-    const canvasCsv = document.createElement("canvas");
+function createCanvas(htmlBox) {
+    const canvas = document.createElement("canvas");
 
-    htmlBox.htmlElement.appendChild(canvasCsv);
+    htmlBox.htmlElement.appendChild(canvas);
 
-    return canvasCsv;
+    return canvas;
+}
+
+function keepOnScreens(sparkle) {
+    const firstScreen = creative.screens[0];
+    const parent = document.getElementById(firstScreen.name).parentNode;
+
+    firstScreen.removeElement(sparkle);
+    parent.appendChild(sparkle.htmlElement);
+
+    sparkle.htmlElement.style.zIndex = 1000;
+
+    sparkle.htmlElement.style.pointerEvents = "none";
 }
