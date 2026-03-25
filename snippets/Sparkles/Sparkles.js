@@ -15,19 +15,24 @@
 const sparklesConfig = {
     htmlBox: sparkles_canvas, // Name of your htmlBox here
     images: [
-        // { name: 'pacman_png', size: { min: 0.1, max: 1 }, opacity: { min: 0, max: 1 }, rotations: { min: 0, max: 360 }, duration: 1000 },
+        { name: 'pacman_png', size: { min: 0.1, max: 1 }, opacity: { min: 0, max: 1 }, rotations: { min: 0, max: 360 }, duration: 1000 },
         { name: 'ellipse1_png', size: { min: 0, max: 1 }, opacity: { min: 0, max: 1 }, rotations: { min: 0, max: 180 }, duration: 1000 },
-        // { name: 'icon_1639167753744_151_png', size: { min: 0.2, max: 1 }, opacity: { min: 0, max: 0.8 }, rotations: { min: 0, max: 90 }, duration: 1500 },
-        // { name: 'icon_png', size: { min: 0.2, max: 0.8 }, opacity: { min: 0, max: 1 }, rotations: { min: 0, max: 90 }, duration: 2500 }
+        { name: 'icon_1639167753744_151_png', size: { min: 0.2, max: 1 }, opacity: { min: 0, max: 0.8 }, rotations: { min: 0, max: 90 }, duration: 1500 },
+        { name: 'icon_png', size: { min: 0.2, max: 0.8 }, opacity: { min: 0, max: 1 }, rotations: { min: 0, max: 90 }, duration: 2500 }
     ],
-    density: 400,
+    density: 40,
     delay: 150,
+    keepOnScreen: true,
 }
 
 sparklesConfig.htmlBox.onshowAnimationEnd.addObserver(function () {
-    keepOnScreens(sparklesConfig.htmlBox);
+
+    if (sparklesConfig.keepOnScreen) keepOnScreens(sparklesConfig.htmlBox);
+
+    setStyle(sparklesConfig.htmlBox);
 
     initSparkle(sparklesConfig);
+
     sparklesConfig.htmlBox.onshowAnimationEnd.removeObserver(arguments.callee);
 });
 
@@ -40,9 +45,11 @@ async function initSparkle(config) {
         delay,
     } = config;
 
-    const canvas = createCanvas(htmlBox);
+    const canvas = createCanvas();
 
     setCanvasSize(canvas, htmlBox);
+
+    appendCanvas(htmlBox, canvas);
 
     const ctx = canvas.getContext('2d');
 
@@ -76,6 +83,7 @@ async function initSparkle(config) {
         bntLoop = bnt.requestAnimFrame(loop);
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+
         sparkles.forEach(sparkle => sparkle.animate());
     }
 
@@ -187,6 +195,12 @@ function getAsset(el) {
     })
 }
 
+function appendCanvas(htmlBox, canvas) {
+    const childElement = htmlBox.htmlElement.querySelector(".animation div");
+
+    childElement.appendChild(canvas);
+}
+
 function setCanvasSize(canvas, htmlBox) {
     canvas.width = htmlBox.htmlElement.offsetWidth;
     canvas.height = htmlBox.htmlElement.offsetHeight;
@@ -195,12 +209,16 @@ function setCanvasSize(canvas, htmlBox) {
     canvas.style.top = 0;
 }
 
-function createCanvas(htmlBox) {
+function createCanvas() {
     const canvas = document.createElement("canvas");
 
-    htmlBox.htmlElement.appendChild(canvas);
-
     return canvas;
+}
+
+function setStyle(sparkle) {
+    sparkle.htmlElement.style.zIndex = 1000;
+
+    sparkle.htmlElement.style.pointerEvents = "none";
 }
 
 function keepOnScreens(sparkle) {
@@ -209,8 +227,4 @@ function keepOnScreens(sparkle) {
 
     firstScreen.removeElement(sparkle);
     parent.appendChild(sparkle.htmlElement);
-
-    sparkle.htmlElement.style.zIndex = 1000;
-
-    sparkle.htmlElement.style.pointerEvents = "none";
 }
