@@ -151,8 +151,8 @@ function getMousePercent(element) {
     startPercent = percent;
   });
 
-  element.htmlElement.addEventListener(events.up, () => { startingXY = undefined; });
-  element.htmlElement.addEventListener(events.cancel, () => { startingXY = undefined; });
+  document.addEventListener(events.up, () => { startingXY = undefined; }, true);
+  document.addEventListener(events.cancel, () => { startingXY = undefined; });
 
   document.addEventListener(events.move, (evt) => {
     if (!startingXY) return;
