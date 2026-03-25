@@ -1,5 +1,3 @@
-// https://studio-ui.teads.tv/studio/6753877077332014/editor/code/js
-
 Screen1.onshow.addObserver(() => {
   const percentController = getPercentController();
 
@@ -23,68 +21,61 @@ function getPercentController() {
     getScrollPercent: scrollPercent,
     getTimePercent: timePercent,
     getMousePercent: mousePercent,
-    events: eventsType,
-    triggerName: 'onTime',
+    pointers: eventsType,
+    eventName: 'onTimeToSwipe',
     element: Shape1,
-    loopPercent: false
+    loopPercent: true
   })
 
   return percentController;
 }
 
 function PercentController(config) {
-  const { getScrollPercent, getTimePercent, getMousePercent, triggerName, element, events, loopPercent } = config;
+  const { eventName, element, pointers, loopPercent, getScrollPercent, getTimePercent, getMousePercent } = config
 
-  const triggers = new Map([
-    ['onScroll', [getScrollPercent]],
-    ['onTime', [getTimePercent]],
-    ['onSwipe', [getMousePercent]],
-    ['onScrollAndSwipe', [getScrollPercent, getMousePercent]]
-  ])
+  const triggers = {
+    Scroll: [getScrollPercent],
+    Time: [getTimePercent],
+    Swipe: [getMousePercent],
+    ScrollSwipe: [getScrollPercent, getMousePercent],
+    TimeSwipe: [getTimePercent, getMousePercent],
+  }
 
-  currentTrigger = triggers.get(triggerName);
+  const triggerName = eventName.replace(/on|To|And/g, "");
+  const toggle = eventName.includes('And')
 
-  let activeGetPercent = currentTrigger[0];
+  const currentTriggers = triggers[triggerName]
 
-  let percentAtSwitch = activeGetPercent();
-  let percent = activeGetPercent();
-  let delta = 0;
+  if (!currentTriggers) return alert(`Invalid trigger: ${triggerName}`)
 
-  const getFinalPercent = (percent) => {
-    if (loopPercent) return percent % 1;
+  let getCurrentPercent = currentTriggers[0]
+  let percent = getCurrentPercent()
+  let percentAtSwitch = percent
 
-    return Math.min(percent, 1)
+  const clamp = (p) => {
+    if (loopPercent) return ((p % 1) + 1) % 1
+    return Math.max(0, Math.min(1, p))
   }
 
   this.getPercent = () => {
-    const currentPercent = activeGetPercent();
-    delta = currentPercent - percentAtSwitch;
-
-    return getFinalPercent(percent + delta)
+    const delta = getCurrentPercent() - percentAtSwitch
+    return clamp(percent + delta)
   }
 
-  const switchToMouse = () => {
-    if (!currentTrigger[1]) return;
+  const switchTo = (trigger) => {
+    if (!trigger) return
 
-    activeGetPercent = currentTrigger[1];
-    percentAtSwitch = activeGetPercent();
-
-    percent += delta;
+    percent = this.getPercent()
+    getCurrentPercent = trigger
+    percentAtSwitch = getCurrentPercent()
   }
 
-  const switchToScroll = () => {
-    if (!currentTrigger[1]) return;
+  element.htmlElement.addEventListener(pointers.down, () => switchTo(currentTriggers[1]))
 
-    activeGetPercent = currentTrigger[0];
-    percentAtSwitch = activeGetPercent();
-
-    percent += delta;
+  if (toggle) {
+    element.htmlElement.addEventListener(pointers.up, () => switchTo(currentTriggers[0]))
+    element.htmlElement.addEventListener(pointers.cancel, () => switchTo(currentTriggers[0]))
   }
-
-  element.htmlElement.addEventListener(events.pointerDown, switchToMouse);
-
-  element.htmlElement.addEventListener(events.pointerUp, switchToScroll);
-  element.htmlElement.addEventListener(events.pointerCancel, switchToScroll);
 }
 
 function getTimePercent(timeframe, shouldReverse) {
@@ -130,18 +121,18 @@ function getEventCoords() {
 function getEventsType() {
   if (DeviceContext.isTablet() || DeviceContext.isMobile()) {
     return {
-      pointerDown: "touchstart",
-      pointerUp: "touchend",
-      pointerMove: "touchmove",
-      pointerCancel: "touchcancel"
+      down: "touchstart",
+      up: "touchend",
+      move: "touchmove",
+      cancel: "touchcancel"
     }
   }
 
   return {
-    pointerDown: "mousedown",
-    pointerUp: "mouseup",
-    pointerMove: "mousemove",
-    pointerCancel: "mouseleave"
+    down: "mousedown",
+    up: "mouseup",
+    move: "mousemove",
+    cancel: "mouseleave"
   }
 }
 
@@ -149,30 +140,34 @@ function getMousePercent(element) {
   const events = getEventsType();
   const getCoords = getEventCoords();
 
-  const remapRange = (val, fromRange, toRange) => {
-    return Math.max(toRange[0], Math.min(toRange[1], (val - fromRange[0]) / (fromRange[1] - fromRange[0]) * toRange[1]))
-  }
-
   const totalWidth = element.htmlElement.offsetWidth;
-  const offset = Math.round(totalWidth / 100) * 5; // Maybe we need better here
 
   let startingXY = undefined;
   let percent = 0;
+  let startPercent = 0;
 
-  function updatePercent(evt) {
+  element.htmlElement.addEventListener(events.down, (evt) => {
+    startingXY = getCoords(evt);
+    startPercent = percent;
+  });
+
+  element.htmlElement.addEventListener(events.up, () => { startingXY = undefined; });
+  element.htmlElement.addEventListener(events.cancel, () => { startingXY = undefined; });
+
+  element.htmlElement.addEventListener(events.move, (evt) => {
     if (!startingXY) return;
 
     const currentXY = getCoords(evt);
-    const adjustedX = remapRange(currentXY.x, [offset, totalWidth - offset], [0, totalWidth]);
+    const deltaX = currentXY.x - startingXY.x;
 
-    percent = adjustedX / totalWidth;
-  }
+    const newPercent = startPercent + deltaX / totalWidth;
+    const loopedPercent = ((newPercent % 1) + 1) % 1;
 
-  element.htmlElement.addEventListener(events.pointerDown, (evt) => { startingXY = getCoords(evt); updatePercent(evt); });
-  document.addEventListener(events.pointerUp, (evt) => { startingXY = undefined });
-  document.addEventListener(events.pointerCancel, (evt) => { startingXY = undefined });
+    percent = loopedPercent;
 
-  document.addEventListener(events.pointerMove, (evt) => { updatePercent(evt); });
+    startingXY = currentXY;
+    startPercent = percent;
+  });
 
   return function () { return percent; }
 }
