@@ -154,7 +154,7 @@ function getMousePercent(element) {
   element.htmlElement.addEventListener(events.up, () => { startingXY = undefined; });
   element.htmlElement.addEventListener(events.cancel, () => { startingXY = undefined; });
 
-  element.htmlElement.addEventListener(events.move, (evt) => {
+  document.addEventListener(events.move, (evt) => {
     if (!startingXY) return;
 
     const currentXY = getCoords(evt);
