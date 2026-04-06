@@ -251,7 +251,7 @@ function Parallax(config) {
             const distanceIndex = Math.min(idx, distanceArray.length - 1);
             const distanceMultiplier = distanceArray[distanceIndex];
             const distance = hideToLeft ?
-                -(distanceMultiplier * canvasWidth + canvasWidth) :
+                -(distanceMultiplier * canvasWidth) :
                 distanceMultiplier * canvasWidth;
 
             updateCSSProperty(layer.element, "transform", getTranslateX(distance));
