@@ -155,7 +155,8 @@ function MoveOnScroll(elements) {
     function toggleElementTransitions(shouldEnable) {
         elements.forEach(function (el, idx) {
             //Skip element if HTML element not yet loaded, or if progressive (transition not needed) 
-
+            if (!el.element.htmlElement) return;
+            
             if (shouldEnable)
                 bnt.requestAnimFrame(function () { addElementTransition(el); });
             else
