@@ -36,7 +36,6 @@ sparklesConfig.htmlBox.onshowAnimationEnd.addObserver(function () {
     sparklesConfig.htmlBox.onshowAnimationEnd.removeObserver(arguments.callee);
 });
 
-
 async function initSparkle(config) {
     const {
         htmlBox,
@@ -97,7 +96,6 @@ async function initSparkle(config) {
 }
 
 function Sparkle({ ctx, canvas, asset, imgConfig }) {
-
     const { size, opacity, rotations, duration } = imgConfig;
 
     const stopwatch = new bnt.Stopwatch();
@@ -144,14 +142,12 @@ function Sparkle({ ctx, canvas, asset, imgConfig }) {
     let currentOpacity, currentRotation;
 
     this.updateSparkle = () => {
-        const time = stopwatch.getTime();
+        let time = stopwatch.getTime();
+        time = time % duration;
 
         let percent = time / duration;
 
         if (percent > 1) {
-            stopwatch.stop();
-            stopwatch.play();
-
             coords = this.getCoords(canvas);
             percent = 0;
         }
