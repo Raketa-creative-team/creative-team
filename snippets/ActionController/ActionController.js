@@ -1,3 +1,11 @@
+// https://studio-ui.teads.tv/studio/6753877077347159/editor/code/js
+
+// loopPercent = false la swipe tot face loop
+// de adaugat comment cu toate variantele de eventName
+
+
+//Unele functii au mai multi parami pt a putea fi folosite individual, dar eu aici nu ii folosesc
+
 Screen1.onshow.addObserver(() => {
   const percentController = getPercentController();
 
@@ -8,12 +16,11 @@ Screen1.onshow.addObserver(() => {
   }
 
   loop();
-
 })
 
 function getPercentController() {
   const scrollPercent = getScrollPercent(0, 1);
-  const timePercent = getTimePercent(10000, true);
+  const timePercent = getTimePercent(10000, false, document);
   const mousePercent = getMousePercent(Shape1);
   const eventsType = getEventsType();
 
@@ -22,9 +29,9 @@ function getPercentController() {
     getTimePercent: timePercent,
     getMousePercent: mousePercent,
     pointers: eventsType,
-    eventName: 'onTimeToSwipe',
+    eventName: 'onTimeAndSwipe', //onSwipe, onScroll, onTime, onScrollAndSwipe, onTimeAndSwipe, onScrollToSwipe, onTimeToSwipe -  To will not return to the previous function
     element: Shape1,
-    loopPercent: true
+    loopPercent: false
   })
 
   return percentController;
@@ -52,14 +59,14 @@ function PercentController(config) {
   let percent = getCurrentPercent()
   let percentAtSwitch = percent
 
-  const clamp = (p) => {
+  const constrainPercent = (p) => {
     if (loopPercent) return ((p % 1) + 1) % 1
     return Math.max(0, Math.min(1, p))
   }
 
   this.getPercent = () => {
     const delta = getCurrentPercent() - percentAtSwitch
-    return clamp(percent + delta)
+    return constrainPercent(percent + delta)
   }
 
   const switchTo = (trigger) => {
@@ -78,7 +85,7 @@ function PercentController(config) {
   }
 }
 
-function getTimePercent(timeframe, shouldReverse) {
+function getTimePercent(timeframe, shouldReverse, element = undefined) {
   let percent = 0;
 
   const stopwatch = new bnt.Stopwatch()
@@ -86,6 +93,14 @@ function getTimePercent(timeframe, shouldReverse) {
 
   adController.onsuspend.addObserver(() => stopwatch.pause())
   adController.onresume.addObserver(() => stopwatch.play())
+
+  if (element) {
+    const eventsType = getEventsType();
+
+    element.addEventListener(eventsType.down, () => stopwatch.stop())
+    element.addEventListener(eventsType.up, () => stopwatch.play())
+    element.addEventListener(eventsType.cancel, () => stopwatch.play())
+  }
 
   const remapPercent = (val) => {
     return 1 - Math.abs(2 * val - 1)
@@ -136,7 +151,7 @@ function getEventsType() {
   }
 }
 
-function getMousePercent(element) {
+function getMousePercent(element, loop = false) {
   const events = getEventsType();
   const getCoords = getEventCoords();
 
@@ -151,6 +166,8 @@ function getMousePercent(element) {
     startPercent = percent;
   });
 
+  const clamp = (input, min, max) => Math.min(Math.max(input, min), max);
+
   document.addEventListener(events.up, () => { startingXY = undefined; }, true);
   document.addEventListener(events.cancel, () => { startingXY = undefined; });
 
@@ -161,9 +178,10 @@ function getMousePercent(element) {
     const deltaX = currentXY.x - startingXY.x;
 
     const newPercent = startPercent + deltaX / totalWidth;
+
     const loopedPercent = ((newPercent % 1) + 1) % 1;
 
-    percent = loopedPercent;
+    percent = loop ? loopedPercent : clamp(newPercent, 0, 1);
 
     startingXY = currentXY;
     startPercent = percent;
@@ -185,7 +203,7 @@ function getScrollPercent(start, end) {
     return Math.max(toRange[0], Math.min(toRange[1], (val - fromRange[0]) / (fromRange[1] - fromRange[0]) * toRange[1]))
   }
 
-  let teadsApi = getTeadsApi()
+  let teadsApi = getTeadsApi();
 
   return function () {
     const api = teadsApi || getTeadsApi();
