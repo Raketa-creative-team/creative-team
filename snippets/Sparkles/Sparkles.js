@@ -120,7 +120,7 @@ function Sparkle({ ctx, canvas, asset, imgConfig }) {
         }
     }
 
-    this.getCoords = (canvas) => {
+    this.generateCoords = (canvas) => {
         return {
             x: canvas.width * Math.random(),
             y: canvas.height * Math.random()
@@ -137,7 +137,7 @@ function Sparkle({ ctx, canvas, asset, imgConfig }) {
     const alpha = this.getFromRange(opacity);
     const angle = this.getFromRange(rotations);
 
-    let coords = this.getCoords(canvas);
+    let coords = this.generateCoords(canvas);
 
     let currentOpacity, currentRotation;
 
@@ -148,7 +148,7 @@ function Sparkle({ ctx, canvas, asset, imgConfig }) {
         let percent = time / duration;
 
         if (percent > 1) {
-            coords = this.getCoords(canvas);
+            coords = this.generateCoords(canvas);
             percent = 0;
         }
 
