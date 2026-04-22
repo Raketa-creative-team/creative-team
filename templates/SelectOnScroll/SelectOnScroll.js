@@ -1,4 +1,4 @@
-// https://demo.teads.com/?content=publishers%252Fteads-tech_english.html&vast=https%3A%2F%2Fs8t.teads.tv%2Fvast%2F6753877077348970
+// https://studio-ui.teads.tv/studio/6753877077348970/editor/create
 
 const config = {
     closeBtn: CloseBtn,
