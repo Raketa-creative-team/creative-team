@@ -107,10 +107,15 @@ function animateElements(elements) {
     const getPercent = getScrollPercent(0, 1);
     const isBetween = (current, range) => current >= range[0] && current <= range[1];
 
+    let lastPercent = getPercent();
+
     function loop() {
         bnt.requestAnimFrame(loop);
 
         const percent = getPercent();
+
+        if (lastPercent === percent) return;
+        lastPercent = percent;
 
         elements.forEach(element => {
             const shouldTranslate = isBetween(percent, element.showBetween);
