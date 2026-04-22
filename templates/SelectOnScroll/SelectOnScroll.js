@@ -15,8 +15,8 @@ const config = {
 
 adController.onstart.addObserver(() => setPrerenderPosition(Panel));
 
-initSelector(config);
-initAnimation(config);
+creative.screens[0].onshow.addObserver(() => initSelector(config));
+creative.screens[0].onshow.addObserver(() => initAnimation(config));
 
 function setPrerenderPosition(element) {
     const state = creative.screens[0].getEos(element).configs.get(bnt.get(bnt.State));
@@ -26,47 +26,41 @@ function setPrerenderPosition(element) {
 }
 
 function initSelector(config) {
-    creative.screens[0].onshow.addObserver(() => {
-        const { closeBtn, thumbs, overlays, bgs } = config;
+    const { closeBtn, thumbs, overlays, bgs } = config;
 
-        const onIndexUpdate = 'onIndexUpdate';
-        const indexUpdate = new CreateCustomEvent(onIndexUpdate);
+    const onIndexUpdate = 'onIndexUpdate';
+    const indexUpdate = new CreateCustomEvent(onIndexUpdate);
 
-        closeBtn.htmlElement.addEventListener('click', () => indexUpdate.dispatch(undefined))
+    closeBtn.htmlElement.addEventListener('click', () => indexUpdate.dispatch(undefined))
 
-        thumbs.eos.forEach((eos, idx) => {
-            eos.element.htmlElement.addEventListener('click', () => indexUpdate.dispatch(idx))
-        })
-
-        document.addEventListener(onIndexUpdate, (event) => {
-            const { detail: { current, previous } } = event;
-
-            if (current === undefined) {
-                restoreDefault(bgs);
-                restoreDefault(overlays);
-
-                closeBtn.hide();
-
-                return bntTracking.trackEvent(`#${closeBtn.elementId}: onclick`, null);
-            }
-
-            onInteraction(bgs, current, previous);
-            onInteraction(overlays, current, previous);
-
-            closeBtn.show();
-
-            return bntTracking.trackEvent(`#${thumbs.eos[current].element.elementId}: onclick`, null);
-        });
+    thumbs.eos.forEach((eos, idx) => {
+        eos.element.htmlElement.addEventListener('click', () => indexUpdate.dispatch(idx))
     })
+
+    document.addEventListener(onIndexUpdate, (event) => {
+        const { detail: { current, previous } } = event;
+
+        if (current === undefined) {
+            restoreDefault(bgs);
+            restoreDefault(overlays);
+
+            closeBtn.hide();
+
+            return bntTracking.trackEvent(`#${closeBtn.elementId}: onclick`, null);
+        }
+
+        onInteraction(bgs, current, previous);
+        onInteraction(overlays, current, previous);
+
+        closeBtn.show();
+
+        return bntTracking.trackEvent(`#${thumbs.eos[current].element.elementId}: onclick`, null);
+    });
 }
 
 function initAnimation(config) {
-    creative.screens[0].onshow.addObserver(() => {
-        setTransition(config.animateElements);
-
-        animateElements(config.animateElements);
-    })
-
+    setTransition(config.animateElements);
+    animateElements(config.animateElements);
 }
 
 function onInteraction(parent, current, previous) {
