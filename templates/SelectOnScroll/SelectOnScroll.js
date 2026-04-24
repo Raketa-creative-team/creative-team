@@ -38,7 +38,7 @@ function initSelector(config) {
     })
 
     document.addEventListener(onIndexUpdate, (event) => {
-        const { detail: { current, previous } } = event;
+        const { data: { current, previous } } = event;
 
         if (current === undefined) {
             restoreDefault(bgs);
@@ -86,13 +86,14 @@ function restoreDefault(parent) {
 function CreateCustomEvent(eventName) {
     let index = undefined;
 
-    const indexUpdateEvent = new CustomEvent(eventName, { bubbles: true, detail: { previous: null, current: null } });
+    const indexUpdateEvent = new CustomEvent(eventName, { bubbles: true });
+    indexUpdateEvent.data = {}
 
     this.dispatch = (inputIndex) => {
         if (index === inputIndex) return;
 
-        indexUpdateEvent.detail.previous = index;
-        indexUpdateEvent.detail.current = inputIndex;
+        indexUpdateEvent.data.previous = index;
+        indexUpdateEvent.data.current = inputIndex;
 
         index = inputIndex;
         document.dispatchEvent(indexUpdateEvent);
