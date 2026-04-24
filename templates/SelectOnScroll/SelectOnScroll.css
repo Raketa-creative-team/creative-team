@@ -1,0 +1,8 @@
+#Thumbs .animation > div > div {
+    transform-origin: 50% 50%;
+    transition: .1s linear !important;
+}
+
+#Thumbs .animation > div > div:active {
+    transform: scale(.9) !important;
+}
