@@ -230,6 +230,8 @@ function Parallax(config) {
         parallaxGroups[index].eos.forEach(layer =>
             updateCSSProperty(layer.element, "transform", getTranslateX(0))
         );
+
+        updateCSSProperty(parallaxGroups[index], "zIndex", (parallaxGroups.length+1));
     }
 
     function hideOtherGroups(newIndex) {
@@ -238,6 +240,7 @@ function Parallax(config) {
             const shouldKeepVisible = idx === newIndex || (idx < newIndex && stack);
             if (shouldKeepVisible) return;
 
+            updateCSSProperty(element, "zIndex", (idx+1));
             hideGroupSlides(idx, newIndex);
         });
     }
