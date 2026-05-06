@@ -1,8 +1,8 @@
 // https://studio-ui.teads.tv/studio/6753877077348970/editor/create
 
 const config = {
-    closeBtn: CloseBtn,
-    thumbs: Thumbs,
+    closeBtn: CloseBtn, 
+    thumbs: Thumbs, 
     overlays: Overlays,
     bgs: BGS,
 
@@ -38,7 +38,7 @@ function initSelector(config) {
     })
 
     document.addEventListener(onIndexUpdate, (event) => {
-        const { data: { current, previous } } = event;
+        const { detail: { current, previous } } = event;
 
         if (current === undefined) {
             restoreDefault(bgs);
@@ -86,14 +86,11 @@ function restoreDefault(parent) {
 function CreateCustomEvent(eventName) {
     let index = undefined;
 
-    const indexUpdateEvent = new CustomEvent(eventName, { bubbles: true });
-    indexUpdateEvent.data = {}
-
     this.dispatch = (inputIndex) => {
         if (index === inputIndex) return;
 
-        indexUpdateEvent.data.previous = index;
-        indexUpdateEvent.data.current = inputIndex;
+        const detail = {previous: index, current: inputIndex}
+        const indexUpdateEvent = new CustomEvent(eventName, { bubbles: true, detail});
 
         index = inputIndex;
         document.dispatchEvent(indexUpdateEvent);
