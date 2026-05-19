@@ -1,0 +1,106 @@
+@use "sass:list";
+
+/**************************************************
+    => Mixins
+**************************************************/
+@mixin animation($name) {
+  animation-name: $name;
+}
+
+@mixin flip-animation($name, $axis, $from, $to) {
+  $rotate: if($axis=='X', rotateX, rotateY);
+
+  @keyframes #{$name} {
+    0% {
+      transform: #{$rotate}(list.nth($from, 1)) translateZ(list.nth($from, 2));
+      visibility: list.nth($from, 3);
+    }
+
+    100% {
+      transform: #{$rotate}(list.nth($to, 1)) translateZ(list.nth($to, 2));
+      visibility: list.nth($to, 3);
+    }
+  }
+
+}
+
+
+/**************************************************
+    => General Rules
+**************************************************/
+body {
+  background-color: white;
+}
+
+.ss {
+  perspective: 1000px;
+
+  * {
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+  }
+
+  // ======================
+  // Flip animations
+  // ======================
+  .flipToLeft-oc,
+  .flipToRight-oc,
+  .flipFromLeft-oc,
+  .flipFromRight-oc,
+  .flipToTop-oc,
+  .flipToBottom-oc,
+  .flipFromTop-oc,
+  .flipFromBottom-oc {
+    backface-visibility: hidden;
+    transform-origin: center;
+  }
+
+  $flips: (
+    flipToLeft-oc: ('Y', (0deg, 1px, visible), (-90deg, -1px, hidden)),
+    flipFromLeft-oc: ('Y', (-90deg, 1px, hidden), (0deg, -1px, visible)),
+    flipToRight-oc: ('Y', (0deg, 1px, visible), (90deg, 1px, hidden)),
+    flipFromRight-oc: ('Y', (90deg, 1px, hidden), (0deg, -1px, visible)),
+    flipToTop-oc: ('X', (0deg, 1px, visible), (-90deg, -1px, hidden)),
+    flipToBottom-oc: ('X', (0deg, 1px, visible), (90deg, 1px, hidden)),
+    flipFromBottom-oc: ('X', (90deg, 1px, hidden), (0deg, -1px, visible)),
+    flipFromTop-oc: ('X', (-90deg, 1px, hidden), (0deg, -1px, visible))
+  );
+
+  @each $name,
+  $vals in $flips {
+    .#{$name} {
+      @include animation($name);
+      @include flip-animation($name, list.nth($vals, 1), list.nth($vals, 2), list.nth($vals, 3));
+    }
+  }
+
+  // ======================
+  // Flip after
+  // ======================
+  .flipFromLeft-oc::after,
+  .flipFromRight-oc::after,
+  .flipFromTop-oc::after,
+  .flipFromBottom-oc::after {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    content: '';
+    opacity: 1;
+
+    animation-name: flip-shadow;
+    animation-duration: inherit;
+  }
+
+
+  .flipFromLeft-oc::after { background: linear-gradient(to left, transparent 0%, black 100%);}
+  .flipFromRight-oc::after { background: linear-gradient(to right, transparent 0%, black 100%);}
+  .flipFromTop-oc::after { background: linear-gradient(to bottom, transparent 0%, black 100%);}
+  .flipFromBottom-oc::after { background: linear-gradient(to top, transparent 0%, black 100%);}
+
+  @keyframes flip-shadow {
+    0%, 50% {opacity: 1;}
+    70% {opacity: 0.7;}
+    100% {opacity: 0;}
+  }
+}
