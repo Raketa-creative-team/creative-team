@@ -6,7 +6,7 @@ function preRender() {
     const hasVideo = allElements.filter(isVideo).length > 0;
     if(hasVideo) return;
 
-    const showHidden = (el) => {
+    const showElement = (el) => {
         const elementVisible = el.element.baseConfig.visible && el.element.baseConfig.width > 0;
         if (!elementVisible) return;
 
@@ -23,7 +23,7 @@ function preRender() {
                 bnt.get(bnt.MainStage).htmlElement.hidden = false;
                 bnt.get(bnt.MainStage).renderersMap.get(creative.screens[0]).screenElement.hidden = false;
 
-                allElements.forEach(showHidden);
+                allElements.forEach(showElement);
 
                 bnt.TeadsPlayerAddons.apiProxy.addObserver(function (api) {
                     if (api) {
