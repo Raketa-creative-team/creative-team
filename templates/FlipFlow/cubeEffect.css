@@ -1,0 +1,205 @@
+/**************************************************
+    => Mixins
+**************************************************/
+/**************************************************
+    => General Rules
+**************************************************/
+body {
+  background-color: white;
+}
+
+.ss {
+  perspective: 1000px;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+.ss * {
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+.ss .flipToLeft-oc,
+.ss .flipToRight-oc,
+.ss .flipFromLeft-oc,
+.ss .flipFromRight-oc,
+.ss .flipToTop-oc,
+.ss .flipToBottom-oc,
+.ss .flipFromTop-oc,
+.ss .flipFromBottom-oc {
+  backface-visibility: hidden;
+  transform-origin: center;
+}
+.ss .flipToLeft-oc {
+  animation-name: flipToLeft-oc;
+}
+@keyframes flipToLeft-oc {
+  0% {
+    transform: rotateY(0deg) translateZ(1px);
+    visibility: visible;
+  }
+  100% {
+    transform: rotateY(-90deg) translateZ(-1px);
+    visibility: hidden;
+  }
+}
+.ss .flipFromLeft-oc {
+  animation-name: flipFromLeft-oc;
+}
+@keyframes flipFromLeft-oc {
+  0% {
+    transform: rotateY(-90deg) translateZ(1px);
+    visibility: hidden;
+  }
+  100% {
+    transform: rotateY(0deg) translateZ(-1px);
+    visibility: visible;
+  }
+}
+.ss .flipToRight-oc {
+  animation-name: flipToRight-oc;
+}
+@keyframes flipToRight-oc {
+  0% {
+    transform: rotateY(0deg) translateZ(1px);
+    visibility: visible;
+  }
+  100% {
+    transform: rotateY(90deg) translateZ(1px);
+    visibility: hidden;
+  }
+}
+.ss .flipFromRight-oc {
+  animation-name: flipFromRight-oc;
+}
+@keyframes flipFromRight-oc {
+  0% {
+    transform: rotateY(90deg) translateZ(1px);
+    visibility: hidden;
+  }
+  100% {
+    transform: rotateY(0deg) translateZ(-1px);
+    visibility: visible;
+  }
+}
+.ss .flipToTop-oc {
+  animation-name: flipToTop-oc;
+}
+@keyframes flipToTop-oc {
+  0% {
+    transform: rotateX(0deg) translateZ(1px);
+    visibility: visible;
+  }
+  100% {
+    transform: rotateX(-90deg) translateZ(-1px);
+    visibility: hidden;
+  }
+}
+.ss .flipToBottom-oc {
+  animation-name: flipToBottom-oc;
+}
+@keyframes flipToBottom-oc {
+  0% {
+    transform: rotateX(0deg) translateZ(1px);
+    visibility: visible;
+  }
+  100% {
+    transform: rotateX(90deg) translateZ(1px);
+    visibility: hidden;
+  }
+}
+.ss .flipFromBottom-oc {
+  animation-name: flipFromBottom-oc;
+}
+@keyframes flipFromBottom-oc {
+  0% {
+    transform: rotateX(90deg) translateZ(1px);
+    visibility: hidden;
+  }
+  100% {
+    transform: rotateX(0deg) translateZ(-1px);
+    visibility: visible;
+  }
+}
+.ss .flipFromTop-oc {
+  animation-name: flipFromTop-oc;
+}
+@keyframes flipFromTop-oc {
+  0% {
+    transform: rotateX(-90deg) translateZ(1px);
+    visibility: hidden;
+  }
+  100% {
+    transform: rotateX(0deg) translateZ(-1px);
+    visibility: visible;
+  }
+}
+.ss .flipFromLeft-oc::after,
+.ss .flipFromRight-oc::after,
+.ss .flipFromTop-oc::after,
+.ss .flipFromBottom-oc::after,
+.ss .flipToLeft-oc::after,
+.ss .flipToRight-oc::after,
+.ss .flipToTop-oc::after,
+.ss .flipToBottom-oc::after {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  content: "";
+  opacity: 1;
+  animation-name: flip-shadow-show;
+  animation-duration: inherit;
+}
+.ss .flipToLeft-oc::after,
+.ss .flipToRight-oc::after,
+.ss .flipToTop-oc::after,
+.ss .flipToBottom-oc::after {
+  animation-name: flip-shadow-hide;
+}
+.ss .flipFromLeft-oc::after {
+  background: linear-gradient(to left, transparent 30%, black 100%);
+}
+.ss .flipFromRight-oc::after {
+  background: linear-gradient(to right, transparent 30%, black 100%);
+}
+.ss .flipFromTop-oc::after {
+  background: linear-gradient(to bottom, transparent 30%, black 100%);
+}
+.ss .flipFromBottom-oc::after {
+  background: linear-gradient(to top, transparent 30%, black 100%);
+}
+.ss .flipToLeft-oc::after {
+  background: linear-gradient(to right, black 0%, transparent 70%);
+}
+.ss .flipToRight-oc::after {
+  background: linear-gradient(to left, black 0%, transparent 70%);
+}
+.ss .flipToTop-oc::after {
+  background: linear-gradient(to top, black 0%, transparent 70%);
+}
+.ss .flipToBottom-oc::after {
+  background: linear-gradient(to bottom, black 0%, transparent 70%);
+}
+@keyframes flip-shadow-show {
+  0%, 50% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes flip-shadow-hide {
+  0% {
+    opacity: 0;
+  }
+  30% {
+    opacity: 0.65;
+  }
+  50%, 100% {
+    opacity: 1;
+  }
+}
+
+/*# sourceMappingURL=cubeEffect.css.map */

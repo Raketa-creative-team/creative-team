@@ -35,6 +35,9 @@ body {
 .ss {
   perspective: 1000px;
 
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+
   * {
     transform-style: preserve-3d;
     backface-visibility: hidden;
@@ -80,7 +83,12 @@ body {
   .flipFromLeft-oc::after,
   .flipFromRight-oc::after,
   .flipFromTop-oc::after,
-  .flipFromBottom-oc::after {
+  .flipFromBottom-oc::after,
+
+  .flipToLeft-oc::after,
+  .flipToRight-oc::after,
+  .flipToTop-oc::after,
+  .flipToBottom-oc::after {
     position: absolute;
     top: 0;
     width: 100%;
@@ -88,19 +96,37 @@ body {
     content: '';
     opacity: 1;
 
-    animation-name: flip-shadow;
+    animation-name: flip-shadow-show;
     animation-duration: inherit;
   }
 
+  .flipToLeft-oc::after,
+  .flipToRight-oc::after,
+  .flipToTop-oc::after,
+  .flipToBottom-oc::after {
+    animation-name: flip-shadow-hide;
+  }
 
-  .flipFromLeft-oc::after { background: linear-gradient(to left, transparent 0%, black 100%);}
-  .flipFromRight-oc::after { background: linear-gradient(to right, transparent 0%, black 100%);}
-  .flipFromTop-oc::after { background: linear-gradient(to bottom, transparent 0%, black 100%);}
-  .flipFromBottom-oc::after { background: linear-gradient(to top, transparent 0%, black 100%);}
+  .flipFromLeft-oc::after { background: linear-gradient(to left, transparent 30%, black 100%);}
+  .flipFromRight-oc::after { background: linear-gradient(to right, transparent 30%, black 100%);}
+  .flipFromTop-oc::after { background: linear-gradient(to bottom, transparent 30%, black 100%);}
+  .flipFromBottom-oc::after { background: linear-gradient(to top, transparent 30%, black 100%);}
 
-  @keyframes flip-shadow {
+  .flipToLeft-oc::after { background: linear-gradient(to right, black 0%, transparent 70%);}
+  .flipToRight-oc::after { background: linear-gradient(to left, black 0%, transparent 70%);}
+  .flipToTop-oc::after { background: linear-gradient(to top, black 0%, transparent 70%);}
+  .flipToBottom-oc::after { background: linear-gradient(to bottom, black 0%, transparent 70%);}  
+
+  @keyframes flip-shadow-show {
     0%, 50% {opacity: 1;}
-    70% {opacity: 0.7;}
+    70% {opacity: 0.5;}
     100% {opacity: 0;}
   }
+
+  @keyframes flip-shadow-hide {
+    0% {opacity:0;}
+    30% {opacity: 0.65;}
+    50%, 100% {opacity: 1;}
+  }
+  
 }
