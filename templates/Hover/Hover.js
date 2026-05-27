@@ -1,4 +1,4 @@
-https://studio-ui.teads.tv/studio/6753877077358492/editor/code/js
+// https://studio-ui.teads.tv/studio/6753877077358492/editor/code/js
 
 const hoverConfig = {
   screen: Screen1,
