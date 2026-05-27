@@ -27,7 +27,7 @@ const hoverConfig = {
 
 };
 
-hoverConfig.screen.onshow.addObserver(() => {
+hoverConfig.screen.onshow.addObserver( function (){
   initHover(hoverConfig);
   hoverConfig.screen.onshow.removeObserver(arguments.callee);
 })
@@ -94,7 +94,7 @@ async function initHover(config) {
 
   container.onhideAnimationEnd.addObserver(() => {
     bnt.cancelAnimFrame(raf)
-    if (backElement instanceof bn.Video) backElement.play();
+    if (backElement instanceof bnt.Video) backElement.play();
   });
 
   loop();
