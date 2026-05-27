@@ -30,12 +30,14 @@ const hoverConfig = {
 hoverConfig.screen.onshow.addObserver( function (){
   initHover(hoverConfig);
   hoverConfig.screen.onshow.removeObserver(arguments.callee);
-})
+});
 
 async function initHover(config) {
   const { autoRevealAt, ui, smoke, preview } = config;
   const { container, brushGroup, frontElement, backElement, hintElement } = ui;
   let raf;
+
+  if(isVertical(container.htmlElement)) return displayErrorMessage();
 
   const canvas = createCanvas(container);
   const ctx = canvas.getContext('2d');
@@ -145,18 +147,18 @@ function getHoverPercent() {
   const tracking = new Map();
   const totalCells = gridCols * gridRows;
 
-  return (screenNode, coords) => {
-    if (coordsOutOfBounds(screenNode, coords)) return null;
+  return (canvas, coords) => {
+    if (coordsOutOfBounds(canvas, coords)) return null;
 
-    const x = Math.floor(coords.x / (screenNode.offsetWidth / gridCols));
-    const y = Math.floor(coords.y / (screenNode.offsetHeight / gridRows));
+    const x = Math.floor(coords.x / (canvas.offsetWidth / gridCols));
+    const y = Math.floor(coords.y / (canvas.offsetHeight / gridRows));
 
     const key = '' + x + y;
 
     if (tracking.has(key)) return null;
     tracking.set(key, true);
 
-    const values = [...tracking.values()].length;
+    const values = tracking.size;
 
     return percent = Math.floor((values / totalCells) * 100);
   }
@@ -186,6 +188,13 @@ function createCanvas(element) {
   parent.appendChild(canvas);
 
   return canvas;
+}
+
+function isVertical(canvas){
+    const screenIsVertical = creative.canvases[0].getAspectRatio() < 0.8;
+    const canvasIsVertical = (canvas.offsetWidth / canvas.offsetHeight) < 0.8;
+    
+    return screenIsVertical && canvasIsVertical
 }
 
 function loadImages(studioImages) {
@@ -357,6 +366,13 @@ const trackEvent = (() => {
 })();
 
 
+function displayErrorMessage(){
+    const errorContainer = document.createElement("div");
+    errorContainer.textContent = "Hover Cannot Be Displayed on Vertical Demos";
+    errorContainer.classList.add("errorMessage");
+    
+    document.body.firstChild.appendChild(errorContainer);
+}
 
 /************************************************************
  * ==> Prevent user accidental scrolly scroll
