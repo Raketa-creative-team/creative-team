@@ -27,17 +27,17 @@ const hoverConfig = {
 
 };
 
-hoverConfig.screen.onshow.addObserver( function (){
+hoverConfig.screen.onshow.addObserver(function () {
+  if (isVertical(hoverConfig.ui.container.htmlElement)) return displayErrorMessage();
+
   initHover(hoverConfig);
   hoverConfig.screen.onshow.removeObserver(arguments.callee);
-});
+})
 
 async function initHover(config) {
   const { autoRevealAt, ui, smoke, preview } = config;
   const { container, brushGroup, frontElement, backElement, hintElement } = ui;
   let raf;
-
-  if(isVertical(container.htmlElement)) return displayErrorMessage();
 
   const canvas = createCanvas(container);
   const ctx = canvas.getContext('2d');
@@ -47,7 +47,7 @@ async function initHover(config) {
   const scaleCoords = getScaledCoords();
 
   const hintDelay = smoke.sizeDuration + smoke.alphaDuration;
-  toggleHint({canvas, events, hintElement, hintDelay});
+  toggleHint({ canvas, events, hintElement, hintDelay });
 
   const getUserCoords = getPageXY({ element: container, events, scaleCoords });
 
@@ -86,11 +86,11 @@ async function initHover(config) {
     new Smoke(getNewConfig()).update();
 
     const percent = getPercent(canvas, getUserCoords());
-    
+
     if (!percent) return;
 
     trackHover(percent);
-  
+
     onHoverEnd(autoRevealAt, percent, container);
   }
 
@@ -103,7 +103,7 @@ async function initHover(config) {
 }
 
 function toggleHint(config) {
-  const { canvas, events, hintElement, delay } = config;
+  const { canvas, events, hintElement, hintDelay } = config;
   let hintTO;
 
   canvas.addEventListener(events.start, () => {
@@ -111,8 +111,8 @@ function toggleHint(config) {
     hintElement.hide();
   });
 
-  canvas.addEventListener(events.up, () => hintTO = setTimeout(hintElement.show, delay));
-  canvas.addEventListener(events.cancel, () => hintTO = setTimeout(hintElement.show, delay));
+  canvas.addEventListener(events.up, () => hintTO = setTimeout(hintElement.show, hintDelay));
+  canvas.addEventListener(events.cancel, () => hintTO = setTimeout(hintElement.show, hintDelay));
 }
 
 function getPageXY(config) {
@@ -120,11 +120,11 @@ function getPageXY(config) {
   const offsetL = element.htmlElement.offsetLeft;
   const offsetT = element.htmlElement.offsetTop;
   let coords = {};
-  
+
   element.htmlElement.addEventListener(events.move, (e) => {
-    const {x, y} = scaleCoords(e);
-    coords = {x: x - offsetL, y: y - offsetT};
-   });
+    const { x, y } = scaleCoords(e);
+    coords = { x: x - offsetL, y: y - offsetT };
+  });
 
   element.htmlElement.addEventListener(events.up, (e) => coords = { x: null, y: null });
   element.htmlElement.addEventListener(events.cancel, (e) => coords = { x: null, y: null });
@@ -136,19 +136,14 @@ function onHoverEnd(autoRevealAt, percent, container) {
   if (autoRevealAt && percent >= autoRevealAt) container.hide();
 }
 
-const coordsOutOfBounds = (element, coords) => {
-  return (coords.y == null || coords.y < 0 || coords.y > element.offsetHeight ||
-    coords.x == null || coords.x < 0 || coords.x > element.offsetWidth);
-}
-
 function getHoverPercent() {
-  const gridCols = 5;
-  const gridRows = 5;
+  const gridCols = 3;
+  const gridRows = 3;
   const tracking = new Map();
   const totalCells = gridCols * gridRows;
 
   return (canvas, coords) => {
-    if (coordsOutOfBounds(canvas, coords)) return null;
+    if (coords?.y == null || coords?.x == null) return null;
 
     const x = Math.floor(coords.x / (canvas.offsetWidth / gridCols));
     const y = Math.floor(coords.y / (canvas.offsetHeight / gridRows));
@@ -160,7 +155,8 @@ function getHoverPercent() {
 
     const values = tracking.size;
 
-    return percent = Math.floor((values / totalCells) * 100);
+    const percent = values / totalCells;
+    return Math.floor(percent * 10) * 10;
   }
 }
 
@@ -190,11 +186,11 @@ function createCanvas(element) {
   return canvas;
 }
 
-function isVertical(canvas){
-    const screenIsVertical = creative.canvases[0].getAspectRatio() < 0.8;
-    const canvasIsVertical = (canvas.offsetWidth / canvas.offsetHeight) < 0.8;
-    
-    return screenIsVertical && canvasIsVertical
+function isVertical(canvas) {
+  const screenIsVertical = creative.canvases[0].getAspectRatio() < 0.8;
+  const canvasIsVertical = (canvas.offsetWidth / canvas.offsetHeight) < 0.8;
+
+  return screenIsVertical && canvasIsVertical
 }
 
 function loadImages(studioImages) {
@@ -297,7 +293,7 @@ function Smoke(config) {
   }
 
   this.update = function () {
-    if (!coords || coords.x == null || coords.y == null) return;
+    if (coords?.x == null || coords?.y == null) return;
 
     if (this.hasFinished()) return sw.stop();
 
@@ -366,12 +362,12 @@ const trackEvent = (() => {
 })();
 
 
-function displayErrorMessage(){
-    const errorContainer = document.createElement("div");
-    errorContainer.textContent = "Hover Cannot Be Displayed on Vertical Demos";
-    errorContainer.classList.add("errorMessage");
-    
-    document.body.firstChild.appendChild(errorContainer);
+function displayErrorMessage() {
+  const errorContainer = document.createElement("div");
+  errorContainer.textContent = "Hover Cannot Be Displayed on Vertical Demos";
+  errorContainer.classList.add("errorMessage");
+
+  document.body.firstChild.appendChild(errorContainer);
 }
 
 /************************************************************
