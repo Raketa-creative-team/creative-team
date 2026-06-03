@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            margin: 0 !important;
+        }
+
+        html,
+        body,
+        .gmap {
+            width: 100%;
+            height: 100%;
+        }
+
+        .location_name {
+            text-align: center;
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .location_address {
+            text-align: center;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class='gmap'></div>
+    <script type="text/javascript">
+        //Listen for post messages
+        addMessageListener();
+
+        //Signal ready
+        window.parent.postMessage(JSON.stringify({ type: "gmap", data: "ready" }), "*");
+
+        function addMessageListener() {
+            window.addEventListener("message", (msg) => {
+                try {
+                    const { type, data } = JSON.parse(msg.data);
+
+                    switch (type) {
+                        case "initMap":
+                            initMap(data);
+                            break;
+                    }
+                }catch (e){}
+            });
+        }
+
+        //Creates Gmap
+        function initMap({ userLocation, zoom, google_map_id, locations, mapStyle, customIcon }) {
+            const { lat, lon } = userLocation;
+            const sortedLocations = getSortedLocations(locations, { lat, lon });
+
+            loadGmapScript(google_map_id)
+                .then(() => displayMap({ sortedLocations, zoom, mapStyle, customIcon }))
+                .catch(error => window.parent.postMessage('{"action": "track", "content": "Google maps failed"}', "*"));
+        }
+
+        //Sort locations by ascending
+        function getSortedLocations(locations, userLocation) {
+            return locations
+                .filter(loc => loc.lat !== null && loc.lon !== null && !(loc.lat === 0 && loc.lon === 0))
+                //Map temporarily, to get the distance so we can sort
+                .map(location => ({
+                    location,
+                    distance: getHaversineDistance(userLocation, location)
+                }))
+                .sort((a, b) => a.distance - b.distance)
+                //Get location, without distance
+                .map(item => item.location);
+        }
+
+        //Load Gmap library
+        function loadGmapScript(api_key) {
+            const script = document.createElement('script');
+            script.async = true;
+
+            const src = "https://maps.googleapis.com/maps/api/js?key=" + api_key + "&libraries=marker"; // no async & callback
+
+            document.head.appendChild(script);
+
+            return new Promise((resolve, reject) => {
+                script.onload = () => resolve(true);
+                script.onerror = () => reject(new Error(`Failed to load script`));
+
+                script.src = src;
+            });
+        }
+
+        //Initialize Gmap
+        function displayMap({ sortedLocations: locations, zoom, mapStyle, customIcon }) {
+            const trackEvent = getTracking();
+            const mapContainer = document.querySelector('.gmap');
+
+            const center = { lat: parseFloat(locations[0].lat), lng: parseFloat(locations[0].lon) };
+            const defaultZoom = 14;
+
+            //Create Google Map
+            const map = new google.maps.Map(mapContainer, {
+                center: center,
+                zoom: zoom || defaultZoom,
+                fullscreenControl: false,
+                // mapId: "DEMO_MAP_ID", // ???
+                styles: mapStyle
+            });
+
+            //Add Markers
+            const markers = locations.map((location, idx) => {
+                const marker = new google.maps.Marker({
+                    position: { lat: parseFloat(location.lat), lng: parseFloat(location.lon) },
+                    map: map
+                });
+
+                if (customIcon)
+                    marker.setIcon({
+                        url: customIcon.url,
+                        scaledSize: new google.maps.Size(customIcon.size, customIcon.size),
+                    });
+
+                const infoWindow = new google.maps.InfoWindow({ content: "" });
+                google.maps.event.addListener(marker, 'click', function () {
+                    infoWindow.setContent("<div class = 'location_name'>" + location.name + "<br>" + location.address + "</div>");
+                    infoWindow.open(map, marker);
+                    trackEvent("Location Marker Click");
+                });
+
+                if (idx == 0) {
+                    infoWindow.setContent("<div class = 'location_name'>" + location.name + "<br>" + location.address + "</div>");
+                    infoWindow.open(map, marker);
+                }
+
+                return marker;
+            });
+
+
+            //Add GMap Listeners
+            [
+                "dragstart",
+                "zoom_changed",
+                "click",
+                "maptypeid_changed",
+                "heading_changed"
+            ].forEach(event =>
+                map.addListener(event, () => trackEvent(event))
+            );
+
+
+            window.parent.postMessage('{"action": "track", "content": "Google maps loaded"}', "*");
+
+            window.parent.postMessage(`{"action": "closestLocation", "content": ${JSON.stringify(locations[0])}}`, "*");
+        }
+
+        //Return tracking function
+        function getTracking() {
+            let firstUserInteraction = true;
+
+            return (event) => {
+                if (firstUserInteraction) {
+                    window.parent.postMessage('{"action": "track", "content": "First User Interaction"}', "*");
+                    firstUserInteraction = false;
+                }
+
+                window.parent.postMessage('{"action": "track", "content": "User Interaction - ' + event + '"}', "*");
+            }
+        }
+
+        const toRadians = (degree) => (degree * Math.PI) / 180;
+
+        //Calculates distance between 2 points
+        function getHaversineDistance(point1, point2) {
+            const EARTH_RADIUS = 6371; // km
+            const dLat = toRadians(point2.lat - point1.lat);
+            const dLon = toRadians(point2.lon - point1.lon);
+
+            //Direct tunnel distance between the two points, in angular percent, 0 to 1
+            const tunnelRatio =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(toRadians(point1.lat)) * Math.cos(toRadians(point2.lat)) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+            const angleFromEarthCenter = 2 * Math.atan2(Math.sqrt(tunnelRatio), Math.sqrt(1 - tunnelRatio));
+            return EARTH_RADIUS * angleFromEarthCenter;
+        }
+
+    </script>
+</body>
+
+</html>
