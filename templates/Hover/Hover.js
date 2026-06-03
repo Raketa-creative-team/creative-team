@@ -20,8 +20,8 @@ const hoverConfig = {
   },
 
   preview: {
-    duration: 1800,             // Animation duration in milliseconds
     enabled: true,              // true, to Reveal parts of backImage if user doesn't interact
+    duration: 1800,             // Animation duration in milliseconds
     delay: 3000,                // Milliseconds of inactivity before preview starts
   },
 
@@ -37,7 +37,7 @@ hoverConfig.screen.onshow.addObserver(function () {
 async function initHover(config) {
   const { autoRevealAt, ui, smoke, preview } = config;
   const { container, brushGroup, frontElement, backElement, hintElement } = ui;
-  let raf;
+  let raf, getCoords;
 
   const canvas = createCanvas(container);
   const ctx = canvas.getContext('2d');
@@ -59,8 +59,10 @@ async function initHover(config) {
 
   frontElement.hide();
 
-  const coordsGenerator = new PathGenerator({ duration: preview.duration, delay: preview.delay, points: getPoints(canvasSize) })
-  let getCoords = coordsGenerator.getPathCoords.bind(coordsGenerator);
+  if (preview.enabled)
+    getCoords = new PathGenerator({ duration: preview.duration, delay: preview.delay, points: getPoints(canvasSize) }).getPathCoords;
+  else
+    getCoords = getUserCoords;
 
   canvas.addEventListener(events.start, () => getCoords = getUserCoords);
 
@@ -122,9 +124,10 @@ function getPageXY(config) {
   let coords = {};
 
   element.htmlElement.addEventListener(events.move, (e) => {
+    e.preventDefault();
     const { x, y } = scaleCoords(e);
     coords = { x: x - offsetL, y: y - offsetT };
-  });
+  }, { passive: false });
 
   element.htmlElement.addEventListener(events.up, (e) => coords = { x: null, y: null });
   element.htmlElement.addEventListener(events.cancel, (e) => coords = { x: null, y: null });
@@ -369,65 +372,3 @@ function displayErrorMessage() {
 
   document.body.firstChild.appendChild(errorContainer);
 }
-
-/************************************************************
- * ==> Prevent user accidental scrolly scroll
- ***********************************************************/
-function preventAccidentalScroll() {
-  let initialPosition, preventDecided = false;
-
-  function addListeners() {
-    const fsParent = document.getElementById(creative.screens[0].name).parentElement;
-
-    fsParent.addEventListener("touchstart", touchStart, { capture: true });     // down
-    fsParent.addEventListener("touchmove", touchMove);                          // move      
-    fsParent.addEventListener("touchend", touchEnd, true);                      // up          
-    fsParent.addEventListener("touchcancel", touchEnd);                         // cancel
-  };
-
-  function touchStart(evt) {
-    initialPosition = getTouchXY(evt);
-  }
-
-  function touchMove(evt) {
-    if (!initialPosition?.x || !evt.cancelable) return;
-
-    const xy = getTouchXY(evt);
-    const dX = Math.abs(xy.x - initialPosition.x);
-    const dY = Math.abs(xy.y - initialPosition.y);
-
-    const thresholdXY = 15;
-    const thresholdX = 5;
-
-    const movedEnough = dX + dY > thresholdXY;
-    const isHorizontalMove = dX - dY > thresholdX;
-
-    preventDecided = !preventDecided && movedEnough;
-
-    if (preventDecided && isHorizontalMove) evt.preventDefault();
-  }
-
-  function touchEnd() {
-    if (!initialPosition?.x) return;
-
-    initialPosition.x = false;
-    preventDecided = false;
-  }
-
-  function getTouchXY(evt) {
-    const scale = creative.canvases[0].config.width / window.innerWidth;
-
-    return {
-      x: evt.touches[0].pageX * scale,
-      y: evt.touches[0].pageY * scale,
-    }
-  }
-
-  addListeners();
-}
-
-creative.screens[0].onshow.addObserver(function () {
-  preventAccidentalScroll();
-
-  creative.screens[0].onshow.removeObserver(arguments.callee);
-});
