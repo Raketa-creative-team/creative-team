@@ -20,8 +20,8 @@ const hoverConfig = {
   },
 
   preview: {
-    delay: 2000,                // Milliseconds of inactivity before preview starts, false to deactivate preview
-    duration: 1800,             // Animation duration in milliseconds
+    duration: 1800,             // Animation duration in milliseconds, 0 to deactivate preview
+    delay: 2000,                // Milliseconds of inactivity before preview starts
   },
 
 };
@@ -58,7 +58,7 @@ async function initHover(config) {
 
   frontElement.hide();
 
-  if (preview.delay !== false)
+  if (preview.duration)
     getCoords = new PathGenerator({ duration: preview.duration, delay: preview.delay, points: getPoints(canvasSize) }).getPathCoords;
   else
     getCoords = getUserCoords;
