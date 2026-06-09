@@ -342,7 +342,7 @@ function getEventsType() {
 
 
 const trackEvent = (() => {
-  let trackedActions = [];
+  const trackedActions = [];
   const debug = false;
   return (actionName, engagement, trackOnce) => {
     if (trackOnce && trackedActions.includes(actionName)) return;
