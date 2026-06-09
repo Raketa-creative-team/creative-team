@@ -224,17 +224,13 @@ function getPoints(canvasSize) {
 
 function PathGenerator(config) {
   const { delay, duration, points } = config;
-  let lastPointId = -1;
 
   const stopwatch = new bnt.Stopwatch();
   stopwatch.play();
 
   this.getStartingPoint = () => {
     const newPointId = Math.floor(Math.random() * points.length);
-
-    if (newPointId == lastPointId) return this.getStartingPoint();
-
-    lastPointId = newPointId;
+    
     return points[newPointId];
 
   };
