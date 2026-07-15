@@ -115,7 +115,7 @@ function toggleHint(config) {
   canvas.addEventListener(events.up, () => hintTO = setTimeout(hintElement.show, hintDelay));
   canvas.addEventListener(events.cancel, () => hintTO = setTimeout(hintElement.show, hintDelay));
 
-  container.onhideAnimationStart.addObserver(() => clearTimeout(hintTO));
+  container.onhideAnimationEnd.addObserver(() => clearTimeout(hintTO));
 }
 
 function getPageXY(config) {
