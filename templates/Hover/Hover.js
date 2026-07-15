@@ -46,7 +46,7 @@ async function initHover(config) {
   const scaleCoords = getScaledCoords();
 
   const hintDelay = smoke.sizeDuration + smoke.alphaDuration;
-  toggleHint({ canvas, events, hintElement, hintDelay });
+  toggleHint({ container, canvas, events, hintElement, hintDelay });
 
   const getUserCoords = getPageXY({ element: container, events, scaleCoords });
 
@@ -114,6 +114,8 @@ function toggleHint(config) {
 
   canvas.addEventListener(events.up, () => hintTO = setTimeout(hintElement.show, hintDelay));
   canvas.addEventListener(events.cancel, () => hintTO = setTimeout(hintElement.show, hintDelay));
+
+  container.onhideAnimationStart.addObserver(() => clearTimeout(hintTO));
 }
 
 function getPageXY(config) {
