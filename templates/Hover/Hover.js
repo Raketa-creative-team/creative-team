@@ -104,7 +104,7 @@ async function initHover(config) {
 }
 
 function toggleHint(config) {
-  const { canvas, events, hintElement, hintDelay } = config;
+  const { container, canvas, events, hintElement, hintDelay } = config;
   let hintTO;
 
   canvas.addEventListener(events.start, () => {
