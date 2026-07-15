@@ -1,8 +1,10 @@
-#HoverAnimationElement{
+#HoverAnimationElement {
   pointer-events: none;
+  animation: wiggle 8.0s ease-in-out 1s infinite;
+  -webkit-animation: wiggle 8.0s ease-in-out 1s infinite;
 }
 
-.errorMessage{
+.errorMessage {
   cursor: default;
   position: absolute;
   width: 100%;
@@ -15,4 +17,71 @@
   align-items: center;
   text-align: center;
   background-color: gainsboro;
+}
+
+
+@keyframes wiggle {
+  3% {
+    margin-left: -30px;
+    transform: rotate(-2.2deg);
+    -webkit-transform: rotate(-2.2deg);
+  }
+
+  9% {
+    margin-left: 30px;
+    transform: rotate(2.2deg);
+    -webkit-transform: rotate(2.2deg);
+  }
+
+  21% {
+    margin-left: -20px;
+    transform: rotate(-2deg);
+    webkit-transform: rotate(2.2deg);
+  }
+
+  33% {
+    margin-left: 20px;
+    transform: rotate(2deg);
+    -webkit-transform: rotate(2deg);
+  }
+
+  47%,
+  0% {
+    margin-left: 0px;
+    transform: rotate(0deg);
+    -webkit-transform: rotate(0deg);
+  }
+}
+
+@-webkit-keyframes wiggle {
+  3% {
+    margin-left: -30px;
+    transform: rotate(-2.2deg);
+    -webkit-transform: rotate(-2.2deg);
+  }
+
+  9% {
+    margin-left: 30px;
+    transform: rotate(2.2deg);
+    -webkit-transform: rotate(2.2deg);
+  }
+
+  21% {
+    margin-left: -20px;
+    transform: rotate(-2deg);
+    webkit-transform: rotate(2.2deg);
+  }
+
+  33% {
+    margin-left: 20px;
+    transform: rotate(2deg);
+    -webkit-transform: rotate(2deg);
+  }
+
+  47%,
+  0% {
+    margin-left: 0;
+    transfrom: rotate(0deg);
+    -webkit-transform: rotate(0deg);
+  }
 }
