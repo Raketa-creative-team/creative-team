@@ -112,10 +112,17 @@ function toggleHint(config) {
     hintElement.hide();
   });
 
-  canvas.addEventListener(events.up, () => hintTO = setTimeout(hintElement.show, hintDelay));
-  canvas.addEventListener(events.cancel, () => hintTO = setTimeout(hintElement.show, hintDelay));
+  const displayHint = () => { hintTO = setTimeout(hintElement.show, hintDelay) };
 
-  container.onhideAnimationEnd.addObserver(() => clearTimeout(hintTO));
+  canvas.addEventListener(events.up, displayHint);
+  canvas.addEventListener(events.cancel, displayHint);
+
+  container.onhideAnimationEnd.addObserver(() => {
+    canvas.removeEventListener(events.up, displayHint);
+    canvas.removeEventListener(events.cancel, displayHint);
+    
+    clearTimeout(hintTO);
+  });
 }
 
 function getPageXY(config) {
@@ -369,3 +376,40 @@ function displayErrorMessage() {
 
   document.body.firstChild.appendChild(errorContainer);
 }
+
+
+
+
+/************************************************************
+* ==> Check if Display viewable
+************************************************************/
+function isDisplayViewable() {
+    if (!creative.screens[0].deepGetEosByType(bnt.Video).length) {
+        bnt.TeadsPlayerAddons.apiProxy.addObserver(function (api) {
+            if (api) {
+                api.getStudioData().map(function (data) {
+                    if (data) data.display = true; else data = { display: true };
+                    api.setStudioData(data).map(function () {
+                        var state = bnt.get(bnt.State);
+                        if (state) {
+                            api.sendVideoMetadata({ width: state.canvas.config.width, height: state.canvas.config.height });
+                        } else {
+                            var fixStage = function (state) {
+                                api.sendVideoMetadata({ width: state.canvas.config.width, height: state.canvas.config.height }); // force player to resize slot in case it got a different size from the vast tag
+                                bnt.get(bnt.StateChangeDetector).stateUpdated.removeObserver(fixStage); // we do this only once -
+                            };
+                            bnt.get(bnt.StateChangeDetector).stateUpdated.addObserver(fixStage);
+                        }
+                    });
+                });
+            }
+            if (window.parent.adApi && window.parent.adApi.bntAd) {
+                window.parent.adApi.bntAd.environment.videoSlot = null;
+            }
+            bnt.TeadsPlayerAddons.brandingModeOnVoidClick = false;
+        });
+    }
+}
+
+isDisplayViewable();
+
