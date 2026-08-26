@@ -1,29 +1,35 @@
-preRender();
-function preRender() {
+function preRenderCT(list = []) {
     const isVideo = (el) => el.element instanceof bnt.Video;
-    const allElements = creative.screens[0].getAllEos();
+    const hasVideo = list.filter(el => isVideo(el)).length || creative.screens[0].deepGetEosByType(bnt.Video).length;
 
-    const hasVideo = allElements.filter(isVideo).length > 0;
-    if(hasVideo) return;
+    if (hasVideo) return;
 
-    const showElement = (el) => {
-        const elementVisible = el.element.baseConfig.visible && el.element.baseConfig.width > 0;
-        if (!elementVisible) return;
+    const elements = list.length ? list : creative.screens[0].eos.map(eos => eos.element);
 
-        el.element.htmlElement.hidden = false;
+    function render(el) {
+        const shouldRender = el.configs.get(bnt.get(bnt.State)).visible;
+
+        if (!shouldRender) return;
+
+        el.htmlElement.hidden = false;
 
         const currentState = bnt.get(bnt.State);
-        const elemConfig = creative.screens[0].deepGetEos(el.element).getConfig(currentState);
-        bnt.ElementRendererRegistry.rendererFor(el.element).applyScreenConfig(currentState, elemConfig);
+        const elemConfig = creative.screens[0].deepGetEos(el).getConfig(currentState);
+        bnt.ElementRendererRegistry.rendererFor(el).applyScreenConfig(currentState, elemConfig);
+
+        if (el.eos) el.eos.forEach(eos => render(eos));
     }
 
     if (typeof bntAd !== 'undefined' && bntAd) {
         bntAd.subscribe(function (e) {
-            adController.renderer.render(adController.element);
-                bnt.get(bnt.MainStage).htmlElement.hidden = false;
-                bnt.get(bnt.MainStage).renderersMap.get(creative.screens[0]).screenElement.hidden = false;
+            //AdLoaded
+            bnt.logger.log('VPAID ADLOADED');
+            adController.renderer.render(adController.element).map(function () {
 
-                allElements.forEach(showElement);
+                document.body.firstChild.hidden = false;
+                bnt.get(bnt.MainStage).renderersMap.get(Screen1).screenElement.hidden = false;
+
+                elements.forEach(el => render(el))
 
                 bnt.TeadsPlayerAddons.apiProxy.addObserver(function (api) {
                     if (api) {
@@ -32,6 +38,16 @@ function preRender() {
                         }
                     }
                 });
+            });
         }, 'AdLoaded');
+
+        Screen1.onshow.addObserver(function () {
+            bnt.get(bnt.MainStage).htmlElement.hidden = true;
+            bnt.get(bnt.MainStage).htmlElement = document.body.querySelector('div');
+
+            Screen1.onshow.removeObserver(arguments.callee);
+        });
     }
-};
+}
+
+preRenderCT();
