@@ -29,7 +29,7 @@ function preRenderCT(list = []) {
                 document.body.firstChild.hidden = false;
                 bnt.get(bnt.MainStage).renderersMap.get(Screen1).screenElement.hidden = false;
 
-                elements.forEach(el => render(el))
+                elements.forEach(el => render(el.element))
 
                 bnt.TeadsPlayerAddons.apiProxy.addObserver(function (api) {
                     if (api) {
