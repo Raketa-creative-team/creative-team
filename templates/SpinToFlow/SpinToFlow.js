@@ -1,4 +1,5 @@
 // https://studio-ui.teads.tv/studio/6753877077385208/editor/code/js
+
 // Make sure to check both configs. There are two below
 
 const spinToFlowConfig = {
@@ -132,7 +133,7 @@ function getFlowInterval(flowGroup, intervals) {
 function handleVideo(container) {
   const hasVideo = container.eos.filter(eos => eos.element.deepGetEosByType(bnt.Video).length)
 
-  if (!hasVideo) return;
+  if (!hasVideo.length) return;
 
   const video = hasVideo[0].element.deepGetEosByType(bnt.Video)[0].element;
 
@@ -225,7 +226,7 @@ function FlipFlow(config) {
   const len = slides.length;
   const tracking = [];
 
-  let prevIdx;
+  let prevIdx = 0;
 
   this.beforeUpdate = () => { }
 
@@ -263,14 +264,12 @@ function FlipFlow(config) {
     container.getEos(slides[prevIdx]).configs.get(bnt.get(bnt.State)).onHide.name = animation.onHide;
   }
 
-  this.gotToSlide = (index) => {
+  this.goToSlide = (index) => {
     const nextAnimation = this.findAnimation(index);
 
     this.setAnimation(index, nextAnimation);
 
     slides[index].show();
-
-    if (prevIdx === undefined) return;
 
     slides[prevIdx].hide();
   }
@@ -304,7 +303,7 @@ function FlipFlow(config) {
 
     if (index === prevIdx) return;
 
-    this.gotToSlide(index);
+    this.goToSlide(index);
     this.track(index);
 
     prevIdx = index;
@@ -319,10 +318,6 @@ function FlipFlow(config) {
     this.setEase(animation.ease)
     this.addClassList(['ss']);
   }
-}
-
-function remapRange(val, fromRange, toRange) {
-  return Math.max(toRange[0], Math.min(toRange[1], (val - fromRange[0]) / (fromRange[1] - fromRange[0]) * toRange[1]))
 }
 
 function fixSize(list) {
@@ -427,10 +422,6 @@ function Flow(config) {
 		this.updateImages(percent);
 		shouldTrack && this.track(percent);
 	}
-}
- 
-function remapRange(val, fromRange, toRange) {
-	return Math.max(toRange[0], Math.min(toRange[1], (val - fromRange[0]) / (fromRange[1] - fromRange[0]) * toRange[1]))
 }
 
 function hideDefaultImage(parent) {
