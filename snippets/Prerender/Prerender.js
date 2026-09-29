@@ -17,7 +17,7 @@ function preRenderCT(list = []) {
         const elemConfig = creative.screens[0].deepGetEos(el).getConfig(currentState);
         bnt.ElementRendererRegistry.rendererFor(el).applyScreenConfig(currentState, elemConfig);
 
-        if (el.eos) el.eos.forEach(eos => render(eos));
+        if (el.eos) el.eos.forEach(eos => render(eos.element));
     }
 
     if (typeof bntAd !== 'undefined' && bntAd) {
@@ -29,7 +29,7 @@ function preRenderCT(list = []) {
                 document.body.firstChild.hidden = false;
                 bnt.get(bnt.MainStage).renderersMap.get(Screen1).screenElement.hidden = false;
 
-                elements.forEach(el => render(el.element))
+                elements.forEach(el => render(el))
 
                 bnt.TeadsPlayerAddons.apiProxy.addObserver(function (api) {
                     if (api) {
