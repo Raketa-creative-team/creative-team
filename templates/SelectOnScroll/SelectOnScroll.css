@@ -6,3 +6,24 @@
 #Thumbs .animation > div > div:active {
     transform: scale(.9) !important;
 }
+
+#Overlays {
+    pointer-events: none;
+}
+
+.pulse {
+    animation: pulse-anim 1s 400ms infinite;
+}
+
+@keyframes pulse-anim{
+
+    0%,
+    100% {
+        transform: scale(1)
+    }
+
+    50% {
+        transform: scale(0.8)
+    }
+}
+

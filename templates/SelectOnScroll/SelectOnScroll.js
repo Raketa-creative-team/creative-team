@@ -1,15 +1,22 @@
-// https://studio-ui.teads.tv/studio/6753877077348970/editor/create
+// https://studio-ui.teads.tv/studio/6753877077388427/editor/code/js
 
 const config = {
-    closeBtn: CloseBtn, 
-    thumbs: Thumbs, 
+    closeBtn: CloseBtn,
+    thumbs: Thumbs,
     overlays: Overlays,
     bgs: BGS,
 
+    icons: {
+        useIcons: true, //use pulsing icons . Set to false to disable
+        color: 'white',
+        size: 40,
+        width: 3,
+    },
+
     animateElements: [
-        { name: BGS, x: -110, y: 0, showBetween: [0.5, 1], transitionTime: 400 },
-        { name: Panel, x: -220, y: 0, showBetween: [0.5, 1], transitionTime: 400 },
-        { name: Overlays, x: -110, y: 0, showBetween: [0.5, 1], transitionTime: 400 },
+        { name: BGS, x: -110, y: 0, showBetween: [0.4, 1], transitionTime: 400 },
+        { name: Panel, x: -220, y: 0, showBetween: [0.4, 1], transitionTime: 400 },
+        { name: Overlays, x: -110, y: 0, showBetween: [0.4, 1], transitionTime: 400 },
     ]
 }
 
@@ -17,12 +24,65 @@ adController.onstart.addObserver(() => setPrerenderPosition(Panel));
 
 creative.screens[0].onshow.addObserver(() => initSelector(config));
 creative.screens[0].onshow.addObserver(() => initAnimation(config));
+creative.screens[0].onshow.addObserver(() => addIcons(config.thumbs, config.icons));
+
 
 function setPrerenderPosition(element) {
     const state = creative.screens[0].getEos(element).configs.get(bnt.get(bnt.State));
     const statePos = { x: creative.canvases[0].config.width };
 
     Object.assign(state, statePos);
+}
+
+function addIcons(thumbs, icons) {
+    if (!icons.useIcons) return;
+
+    const interiorStyle = {
+        width: `${icons.size / 4}px`,
+        height: `${icons.size / 4}px`,
+        position: 'absolute'
+    };
+
+    const interiorLeft = {
+        ...interiorStyle,
+        borderLeft: `${icons.width}px solid ${icons.color}`,
+        borderTop: `${icons.width}px solid ${icons.color}`,
+        top: '0px',
+        left: '0px'
+    };
+
+    const interiorRight = {
+        ...interiorStyle,
+        borderRight: `${icons.width}px solid ${icons.color}`,
+        borderBottom: `${icons.width}px solid ${icons.color}`,
+        right: '0px',
+        bottom: '0px'
+    };
+
+    const iconBoxStyle = {
+        width: `${icons.size}px`,
+        height: `${icons.size}px`,
+        position: 'absolute',
+        left: '10px',
+        bottom: '10px'
+    };
+
+    thumbs.eos.forEach(eos => {
+        const icon = document.createElement('div');
+        const leftSide = document.createElement('div');
+        const rightSide = document.createElement('div');
+
+        Object.assign(icon.style, iconBoxStyle);
+        Object.assign(leftSide.style, interiorLeft);
+        Object.assign(rightSide.style, interiorRight);
+
+        icon.appendChild(leftSide);
+        icon.appendChild(rightSide);
+
+        icon.classList.add('pulse')
+
+        eos.element.htmlElement.appendChild(icon);
+    });
 }
 
 function initSelector(config) {
@@ -82,15 +142,14 @@ function restoreDefault(parent) {
     options?.element.eos.forEach(option => option.element.hide())
 }
 
-
 function CreateCustomEvent(eventName) {
     let index = undefined;
 
     this.dispatch = (inputIndex) => {
         if (index === inputIndex) return;
 
-        const detail = {previous: index, current: inputIndex}
-        const indexUpdateEvent = new CustomEvent(eventName, { bubbles: true, detail});
+        const detail = { previous: index, current: inputIndex }
+        const indexUpdateEvent = new CustomEvent(eventName, { bubbles: true, detail });
 
         index = inputIndex;
         document.dispatchEvent(indexUpdateEvent);
