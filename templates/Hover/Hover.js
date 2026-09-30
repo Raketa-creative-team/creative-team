@@ -1,4 +1,4 @@
-// https://studio-ui.teads.tv/studio/6753877077358492/editor/code/js
+// https://studio-ui.teads.tv/studio/6753877077388867/editor/create
 
 const hoverConfig = {
   screen: Screen1,
@@ -22,6 +22,7 @@ const hoverConfig = {
   preview: {
     duration: 1800,             // Animation duration in milliseconds, 0 to deactivate preview
     delay: 2000,                // Milliseconds of inactivity before preview starts
+    animation: 'random-all'   // curveUpFromLeft, curveDownFromLeft, curveUpFromRight, curveDownFromRight, spot, random-curve, random-all
   },
 
 };
@@ -58,10 +59,12 @@ async function initHover(config) {
 
   frontElement.hide();
 
-  if (preview.duration)
-    getCoords = new PathGenerator({ duration: preview.duration, delay: preview.delay, points: getPoints(canvasSize) }).getPathCoords;
-  else
+  if (preview.duration) {
+    const {duration, delay, animation} = preview
+    getCoords = new PathGenerator({ duration, delay, points: getPoints(canvasSize, animation) }).getPathCoords;
+  } else {
     getCoords = getUserCoords;
+  }
 
   canvas.addEventListener(events.start, () => getCoords = getUserCoords);
 
@@ -220,15 +223,27 @@ function loadImages(studioImages) {
   return Promise.all(imgElements.map(loadImage));
 }
 
-function getPoints(canvasSize) {
+function getPoints(canvasSize, animation) {
   const { width, height } = canvasSize;
 
-  return [
-    { start: { x: 0, y: height / 2 }, end: { x: width / 2, y: 0 } },
-    { start: { x: 0, y: height / 2 }, end: { x: width / 2, y: height } },
-    { start: { x: width, y: height / 2 }, end: { x: width / 2, y: 0 } },
-    { start: { x: width, y: height / 2 }, end: { x: width / 2, y: height } },
-  ];
+  const points = new Map([
+    ['curveDownFromLeft', function () {return { start: { x: 0, y: height / 2 }, end: { x: width / 2, y: height } }}],
+    ['curveUpFromLeft', function () {return { start: { x: 0, y: height / 2 }, end: { x: width / 2, y: 0 } }}],
+    ['curveDownFromRight', function () { return { start: { x: width, y: height / 2 }, end: { x: width / 2, y: height } }}],
+    ['curveUpFromRight', function() { return  { start: { x: width, y: height / 2 }, end: { x: width / 2, y: 0 } }}],
+    
+    ['spot', function () {
+      const x = Math.round(Math.random() * width);
+      const y = Math.round(Math.random() * height);
+
+      return {start: {x, y}, end: {x, y}}
+     }]
+  ])
+
+  if (animation === 'random-all') return [...points.values()];
+  if (animation === 'random-curve') return [...points.entries()].filter(([k, v]) => k.includes('curve')).map(p => p[1]);
+  
+  return [points.get(animation)]
 }
 
 function PathGenerator(config) {
@@ -240,7 +255,7 @@ function PathGenerator(config) {
   this.getStartingPoint = () => {
     const newPointId = Math.floor(Math.random() * points.length);
     
-    return points[newPointId];
+    return points[newPointId]();
 
   };
 
@@ -262,6 +277,8 @@ function PathGenerator(config) {
 
     const percent = (stopwatch.getTime() - delay) / duration;
 
+    if (percent < 0 || percent > 1) return;
+
     const totalDistanceX = currentPoint.end.x - currentPoint.start.x;
     const totalDistanceY = currentPoint.end.y - currentPoint.start.y;
 
@@ -277,6 +294,7 @@ function PathGenerator(config) {
   };
 
 }
+
 
 function Smoke(config) {
   const { size, sizeDuration, alphaDuration, ctx, coords, img } = config;
@@ -412,4 +430,3 @@ function isDisplayViewable() {
 }
 
 isDisplayViewable();
-
