@@ -1,10 +1,9 @@
-// https://studio-ui.teads.tv/studio/6753877077385208/editor/code/js
-
 // Make sure to check both configs. There are two below
+// https://studio-ui.teads.tv/studio/6753877077385208/editor/code/js
 
 const spinToFlowConfig = {
     flow: {
-      studioElement: Placeholder, // Name of the element from the studio that contains the images
+      studioElement: FlowPlaceholder, // Name of the element from the studio that contains the images
       assetName: 'img__#__jpg',     // Naming convention for the images in your library (e.g., img_1_jpg, img_2_jpg, etc.)
       start: 1,
       end: 16
@@ -16,7 +15,7 @@ const spinToFlowConfig = {
 
   intervals: [
     { element: Slide1, start: 0 }, //values between 0 and 1; Element has to be the name of the group
-    { element: FlowSlide, start: 0.2 } //values between 0 and 1; Element has to be the name of the group
+    { element: Slide2, start: 0.2 } //values between 0 and 1; Element has to be the name of the group
   ]
 }
 
@@ -46,7 +45,7 @@ const flipFlowConfig = {
     ease: 'none',
 
     next: {
-      onShow: 'flipFromRight-oc',
+      onShow: 'expandFromTop',
       onHide: 'auto', // use auto to let the template decide the best animation when scrolling down or pick any of the animations above or adavance setup
     },
     previous: {
@@ -320,6 +319,10 @@ function FlipFlow(config) {
   }
 }
 
+function remapRange(val, fromRange, toRange) {
+  return Math.max(toRange[0], Math.min(toRange[1], (val - fromRange[0]) / (fromRange[1] - fromRange[0]) * toRange[1]))
+}
+
 function fixSize(list) {
   list.forEach(el => {
     const child = el.htmlElement.querySelector('.animation > div')
@@ -479,7 +482,7 @@ function loadImage(asset, parent) {
  
 	bnt.setSrc(img, "asset://" + asset, creative.getCanvases()[0].config.width);
  
-	var parentHtml = parent.htmlElement.querySelector('.animation div');
+	var parentHtml = parent.htmlElement.querySelector('.animation > div');
 	parentHtml.appendChild(img);
  
 	bnt.setupWebkitResponsiveImageFix(img);
