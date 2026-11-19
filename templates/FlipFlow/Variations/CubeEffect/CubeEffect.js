@@ -241,11 +241,9 @@ function FlipFlow(config) {
 
         this.setAnimation(index, nextAnimation);
 
-        slides[index].show();
-
-        if (prevIdx === undefined) return;
-
-        slides[prevIdx].hide();
+        slides[prevIdx]?.hide();
+        
+        setTimeout(slides[index].show, 10);
     }
 
     this.clamp = (num, min, max) => {
